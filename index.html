@@ -1,0 +1,622 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hệ Thống Quản Lý Tạp Hóa - Pro</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+      :root {
+        --primary: #2c3e50;
+        --success: #27ae60;
+        --danger: #e74c3c;
+        --info: #3498db;
+        --warning: #f39c12;
+        --bg: #f8f9fa;
+      }
+      body {
+        font-family: "Segoe UI", Tahoma, sans-serif;
+        background: var(--bg);
+        margin: 0;
+        overflow-x: hidden;
+      }
+
+      /* Navigation */
+      nav {
+        background: var(--primary);
+        color: white;
+        padding: 10px 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        position: sticky;
+        top: 0;
+        z-index: 100;
+      }
+      .nav-btns {
+        display: flex;
+        gap: 10px;
+      }
+      .nav-btns a,
+      .nav-btns button {
+        background: #34495e;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        cursor: pointer;
+        border-radius: 5px;
+        text-decoration: none;
+        font-weight: bold;
+        font-size: 13px;
+      }
+      .btn-fruit {
+        background: var(--warning) !important;
+        color: white !important;
+      }
+
+      /* Main Layout */
+      .main-content {
+        display: grid;
+        grid-template-columns: 1fr 1.2fr;
+        gap: 20px;
+        padding: 20px;
+      }
+      .card {
+        background: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        display: flex;
+        flex-direction: column;
+      }
+      h3 {
+        margin-top: 0;
+        color: var(--primary);
+        border-bottom: 2px solid #eee;
+        padding-bottom: 10px;
+      }
+
+      /* Table Design */
+      .table-wrapper {
+        flex: 1;
+        overflow-y: auto;
+        max-height: 400px;
+        margin-top: 10px;
+        border: 1px solid #eee;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 14px;
+      }
+      th {
+        background: #f4f6f7;
+        position: sticky;
+        top: 0;
+        padding: 12px;
+        text-align: left;
+        border-bottom: 2px solid #dee2e6;
+      }
+      td {
+        padding: 12px;
+        border-bottom: 1px solid #eee;
+      }
+
+      input,
+      select {
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        width: 100%;
+        box-sizing: border-box;
+        margin-bottom: 10px;
+      }
+      .btn-add {
+        background: var(--success);
+        color: white;
+        border: none;
+        padding: 12px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        width: 100%;
+      }
+
+      /* Search List */
+      .search-area {
+        position: relative;
+      }
+      .search-list {
+        position: absolute;
+        width: 100%;
+        background: white;
+        border: 1px solid #ddd;
+        z-index: 10;
+        max-height: 200px;
+        overflow-y: auto;
+        display: none;
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+      }
+      .search-item {
+        padding: 12px;
+        cursor: pointer;
+        border-bottom: 1px solid #eee;
+        display: flex;
+        justify-content: space-between;
+      }
+      .search-item:hover {
+        background: #f1f8ff;
+        color: var(--info);
+      }
+
+      /* Payment & QR */
+      .pay-section {
+        background: #fff9db;
+        padding: 20px;
+        border-radius: 8px;
+        margin-top: 20px;
+        border: 1px solid #f1c40f;
+        text-align: center;
+      }
+      #qrBox {
+        display: none;
+        margin-top: 15px;
+      }
+      #qrBox img {
+        width: 180px;
+        border: 4px solid white;
+        border-radius: 10px;
+      }
+
+      /* Admin Panel */
+      #adminPanel {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: white;
+        z-index: 1000;
+        display: none;
+        padding: 30px;
+        box-sizing: border-box;
+        overflow-y: auto;
+      }
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 15px;
+        margin: 20px 0;
+      }
+      .stat-card {
+        background: var(--primary);
+        color: white;
+        padding: 20px;
+        border-radius: 8px;
+        text-align: center;
+      }
+      .stat-card h4 {
+        margin: 0;
+        font-size: 0.9rem;
+        opacity: 0.8;
+      }
+      .stat-card p {
+        margin: 10px 0 0;
+        font-size: 1.4rem;
+        font-weight: bold;
+      }
+
+      @media print {
+        .no-print {
+          display: none !important;
+        }
+        .print-area {
+          display: block !important;
+        }
+      }
+      .print-area {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="no-print">
+      <div style="font-size: 20px; font-weight: bold">
+        🏢 QUẢN LÝ TẠP HÓA ÁI CỬ
+      </div>
+      <div class="nav-btns">
+        <a href="hoaqua.html" class="btn-fruit">🍎 Bán Hoa Quả</a>
+        <button onclick="openAdmin()" style="background: var(--info)">
+          📊 Báo cáo doanh thu
+        </button>
+      </div>
+    </nav>
+
+    <div class="main-content no-print">
+      <div class="card">
+        <h3>📦 Quản Lý Kho</h3>
+        <div style="display: flex; gap: 10px">
+          <input type="text" id="inName" placeholder="Tên hàng hóa" />
+          <input type="number" id="inPrice" placeholder="Giá bán" />
+          <input type="number" id="inQty" placeholder="Số lượng" />
+        </div>
+        <button class="btn-add" onclick="saveInv()">+ Nhập hàng mới</button>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Tên hàng</th>
+                <th>Giá</th>
+                <th>Tồn</th>
+                <th>Xóa</th>
+              </tr>
+            </thead>
+            <tbody id="invTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>🛒 Bán Hàng (Chọn nhiều món)</h3>
+        <div class="search-area">
+          <input
+            type="text"
+            id="shopSearch"
+            placeholder="🔍 Gõ tên sản phẩm cần tìm..."
+            onkeyup="searchProduct()"
+          />
+          <div id="searchList" class="search-list"></div>
+        </div>
+
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>Tên hàng</th>
+                <th>SL</th>
+                <th>Thành tiền</th>
+                <th>Hủy</th>
+              </tr>
+            </thead>
+            <tbody id="cartTableBody"></tbody>
+          </table>
+        </div>
+
+        <div class="pay-section">
+          <h1 style="margin: 0; color: var(--danger)">
+            TỔNG: <span id="totalLabel">0</span> VNĐ
+          </h1>
+          <select id="payMethod" onchange="toggleQR()" style="margin-top: 15px">
+            <option value="cash">Tiền mặt</option>
+            <option value="qr">Chuyển khoản (Mã QR)</option>
+          </select>
+
+          <div id="qrBox">
+            <img id="qrImg" src="" />
+            <br />
+            <button
+              class="btn-add"
+              style="
+                background: var(--info);
+                margin-top: 10px;
+                width: auto;
+                padding: 8px 20px;
+              "
+              onclick="hideQR()"
+            >
+              ✅ Đã nhận tiền (Ẩn QR)
+            </button>
+          </div>
+
+          <button
+            class="btn-add"
+            style="
+              background: #e67e22;
+              height: 55px;
+              font-size: 1.2rem;
+              margin-top: 15px;
+            "
+            onclick="finishSale()"
+          >
+            📠 IN HÓA ĐƠN & TRỪ KHO
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div id="adminPanel">
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          border-bottom: 2px solid #eee;
+          padding-bottom: 15px;
+        "
+      >
+        <h1>📈 Báo Cáo Doanh Thu Chi Tiết</h1>
+        <button
+          onclick="closeAdmin()"
+          style="
+            padding: 10px 25px;
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+          "
+        >
+          ĐÓNG X
+        </button>
+      </div>
+
+      <div class="stat-grid">
+        <div class="stat-card" style="background: #1abc9c">
+          <h4>HÔM NAY</h4>
+          <p id="sumDay">0</p>
+        </div>
+        <div class="stat-card" style="background: #3498db">
+          <h4>TUẦN NÀY</h4>
+          <p id="sumWeek">0</p>
+        </div>
+        <div class="stat-card" style="background: #9b59b6">
+          <h4>THÁNG NÀY</h4>
+          <p id="sumMonth">0</p>
+        </div>
+        <div class="stat-card" style="background: #e67e22">
+          <h4>CẢ NĂM</h4>
+          <p id="sumYear">0</p>
+        </div>
+      </div>
+
+      <h3>Lịch sử giao dịch (Kéo xuống để xem tất cả)</h3>
+      <div class="table-wrapper" style="max-height: 500px">
+        <table>
+          <thead style="position: sticky; top: 0; background: #eee">
+            <tr>
+              <th>Thời gian</th>
+              <th>Chi tiết sản phẩm</th>
+              <th>Tổng đơn</th>
+            </tr>
+          </thead>
+          <tbody id="historyBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <div id="printArea" class="print-area">
+      <center>
+        <h2>HÓA ĐƠN TẠP HÓA</h2>
+        <p id="pDate"></p>
+      </center>
+      <hr />
+      <table style="width: 100%">
+        <tbody id="pItems"></tbody>
+      </table>
+      <hr />
+      <h3 id="pTotal" style="text-align: right"></h3>
+    </div>
+
+    <script>
+      let db = JSON.parse(localStorage.getItem("store_data_v3")) || {
+        products: [],
+        sales: [],
+      };
+      let cart = [];
+
+      // --- KHO ---
+      function saveInv() {
+        const name = document.getElementById("inName").value;
+        const price = parseInt(document.getElementById("inPrice").value);
+        const qty = parseInt(document.getElementById("inQty").value);
+        if (!name || isNaN(price)) return;
+        db.products.push({ name, price, qty });
+        update();
+        document.getElementById("inName").value = "";
+        document.getElementById("inPrice").value = "";
+        document.getElementById("inQty").value = "";
+      }
+
+      function renderInv() {
+        document.getElementById("invTableBody").innerHTML = db.products
+          .map(
+            (p, i) => `
+            <tr><td>${p.name}</td><td>${p.price.toLocaleString()}</td><td><b>${p.qty}</b></td>
+            <td><button onclick="db.products.splice(${i},1);update()" style="color:red; border:none; background:none; cursor:pointer">Xóa</button></td></tr>`,
+          )
+          .join("");
+      }
+
+      // --- BÁN HÀNG ---
+      function searchProduct() {
+        const key = document.getElementById("shopSearch").value.toLowerCase();
+        const list = document.getElementById("searchList");
+        if (!key) {
+          list.style.display = "none";
+          return;
+        }
+        const matches = db.products.filter((p) =>
+          p.name.toLowerCase().includes(key),
+        );
+        list.innerHTML = matches
+          .map((p) => {
+            const idx = db.products.indexOf(p);
+            return `<div class="search-item" onclick="addCart(${idx})"><span>${p.name}</span><b>${p.price.toLocaleString()}đ (Tồn:${p.qty})</b></div>`;
+          })
+          .join("");
+        list.style.display = "block";
+      }
+
+      function addCart(idx) {
+        const item = db.products[idx];
+        const num = prompt(`Số lượng món [${item.name}]:`, 1);
+        const qty = parseInt(num);
+        if (!qty || qty <= 0 || qty > item.qty)
+          return alert("Số lượng không hợp lệ!");
+        cart.push({
+          idx,
+          name: item.name,
+          price: item.price,
+          qty,
+          total: item.price * qty,
+        });
+        document.getElementById("searchList").style.display = "none";
+        document.getElementById("shopSearch").value = "";
+        renderCart();
+      }
+
+      function renderCart() {
+        let total = 0;
+        document.getElementById("cartTableBody").innerHTML = cart
+          .map((item, i) => {
+            total += item.total;
+            return `<tr><td>${item.name}</td><td>${item.qty}</td><td>${item.total.toLocaleString()}</td>
+            <td><button onclick="cart.splice(${i},1);renderCart()" style="border:none;background:none;color:red;cursor:pointer">✖</button></td></tr>`;
+          })
+          .join("");
+        document.getElementById("totalLabel").innerText =
+          total.toLocaleString();
+        if (document.getElementById("payMethod").value === "qr")
+          updateQR(total);
+      }
+
+      // --- THANH TOÁN ---
+      function toggleQR() {
+        const method = document.getElementById("payMethod").value;
+        const total = cart.reduce((s, i) => s + i.total, 0);
+        if (method === "qr" && total > 0) {
+          updateQR(total);
+          document.getElementById("qrBox").style.display = "block";
+        } else {
+          document.getElementById("qrBox").style.display = "none";
+        }
+      }
+
+      function updateQR(amount) {
+        document.getElementById("qrImg").src =
+          `https://img.vietqr.io/image/MB-0386823702-compact.png?amount=${amount}&addInfo=TapHoa2026`;
+      }
+
+      function hideQR() {
+        document.getElementById("qrBox").style.display = "none";
+      }
+
+      function finishSale() {
+        if (cart.length === 0) return alert("Giỏ hàng trống!");
+        const now = new Date();
+        let saleRecord = {
+          timestamp: now.getTime(),
+          timeStr: now.toLocaleString(),
+          items: cart.map((c) => `${c.name}(${c.qty})`).join(", "),
+          total: cart.reduce((s, i) => s + i.total, 0),
+        };
+
+        cart.forEach((c) => {
+          db.products[c.idx].qty -= c.qty;
+        });
+        db.sales.push(saleRecord);
+
+        // In hóa đơn
+        document.getElementById("pDate").innerText = saleRecord.timeStr;
+        document.getElementById("pItems").innerHTML = cart
+          .map(
+            (i) =>
+              `<tr><td>${i.name}</td><td>x${i.qty}</td><td>${i.total.toLocaleString()}đ</td></tr>`,
+          )
+          .join("");
+        document.getElementById("pTotal").innerText =
+          "TỔNG CỘNG: " + saleRecord.total.toLocaleString() + " VNĐ";
+        window.print();
+
+        cart = [];
+        update();
+        renderCart();
+        hideQR();
+      }
+
+      // --- QUẢN TRỊ & THỐNG KÊ ---
+      function openAdmin() {
+        const pass = prompt("Nhập mã quản lý:");
+        if (pass !== "123") return alert("Sai mật khẩu!");
+        document.getElementById("adminPanel").style.display = "block";
+        calculateStats();
+        renderHistory();
+      }
+
+      function calculateStats() {
+        const now = new Date();
+        const startOfDay = new Date().setHours(0, 0, 0, 0);
+        const startOfWeek = new Date(
+          now.setDate(now.getDate() - now.getDay()),
+        ).setHours(0, 0, 0, 0);
+        const startOfMonth = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          1,
+        ).getTime();
+        const startOfYear = new Date(now.getFullYear(), 0, 1).getTime();
+
+        const sum = (startTime) =>
+          db.sales
+            .filter((s) => s.timestamp >= startTime)
+            .reduce((a, b) => a + b.total, 0);
+
+        document.getElementById("sumDay").innerText =
+          sum(startOfDay).toLocaleString() + "đ";
+        document.getElementById("sumWeek").innerText =
+          sum(startOfWeek).toLocaleString() + "đ";
+        document.getElementById("sumMonth").innerText =
+          sum(startOfMonth).toLocaleString() + "đ";
+        document.getElementById("sumYear").innerText =
+          sum(startOfYear).toLocaleString() + "đ";
+      }
+
+      function renderHistory() {
+        document.getElementById("historyBody").innerHTML = db.sales
+          .slice()
+          .reverse()
+          .map(
+            (s) => `
+            <tr><td>${s.timeStr}</td><td>${s.items}</td><td><b>${s.total.toLocaleString()}đ</b></td></tr>
+        `,
+          )
+          .join("");
+      }
+
+      function closeAdmin() {
+        document.getElementById("adminPanel").style.display = "none";
+      }
+      function update() {
+        localStorage.setItem("store_data_v3", JSON.stringify(db));
+        renderInv();
+      }
+
+      renderInv();
+    </script>
+    <footer
+      class="no-print"
+      style="
+        text-align: center;
+        padding: 20px;
+        color: #7f8c8d;
+        font-size: 14px;
+        margin-top: 30px;
+        border-top: 1px solid #eee;
+      "
+    ></footer>
+    <footer
+      class="no-print"
+      style="
+        text-align: center;
+        padding: 20px;
+        color: #7f8c8d;
+        font-size: 14px;
+        margin-top: 30px;
+        border-top: 1px solid #eee;
+      "
+    >
+      <p>© 2026 Bản quyền thuộc về Tạp Hóa ÁI CỬ</p>
+    </footer>
+  </body>
+</html>
