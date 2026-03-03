@@ -191,16 +191,22 @@
         text-align: center;
       }
 
-      @media print {
-        .no-print {
-          display: none !important;
+      /* Thêm dòng này vào cuối phần <style> của file hoaqua.html */
+      @media (max-width: 850px) {
+        .main-content {
+          grid-template-columns: 1fr; /* Xếp dọc 9:16 */
         }
-        .print-area {
-          display: block !important;
+        nav {
+          flex-direction: column;
+          gap: 10px;
         }
-      }
-      .print-area {
-        display: none;
+        .stat-grid {
+          grid-template-columns: repeat(2, 1fr);
+        }
+        .nav-btns {
+          width: 100%;
+          justify-content: center;
+        }
       }
     </style>
   </head>
