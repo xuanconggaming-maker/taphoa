@@ -2,23 +2,26 @@
 <html lang="vi">
   <head>
     <meta charset="UTF-8" />
-    <title>Hệ Thống Bán Hoa Quả - Cân Ký</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Hệ Thống Hoa Quả - Cloud Sync</title>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+
     <style>
       :root {
         --primary: #1b5e20;
         --success: #43a047;
         --danger: #e53935;
         --info: #0288d1;
-        --warning: #ffa000;
         --bg: #f1f8e9;
       }
       body {
         font-family: "Segoe UI", Tahoma, sans-serif;
         background: var(--bg);
         margin: 0;
+        overflow-x: hidden;
       }
 
-      /* Navigation */
       nav {
         background: var(--primary);
         color: white;
@@ -46,11 +49,7 @@
         font-weight: bold;
         font-size: 13px;
       }
-      .btn-home {
-        background: #546e7a !important;
-      }
 
-      /* Main Layout */
       .main-content {
         display: grid;
         grid-template-columns: 1fr 1.2fr;
@@ -68,11 +67,10 @@
       h3 {
         margin-top: 0;
         color: var(--primary);
-        border-bottom: 2px solid #e8f5e9;
+        border-bottom: 2px solid #eee;
         padding-bottom: 10px;
       }
 
-      /* Table Design */
       .table-wrapper {
         flex: 1;
         overflow-y: auto;
@@ -86,20 +84,18 @@
         font-size: 14px;
       }
       th {
-        background: #f1f8e9;
+        background: #f4f6f7;
         position: sticky;
         top: 0;
         padding: 12px;
         text-align: left;
-        border-bottom: 2px solid #c8e6c9;
       }
       td {
         padding: 12px;
         border-bottom: 1px solid #eee;
       }
 
-      input,
-      select {
+      input {
         padding: 10px;
         border: 1px solid #ddd;
         border-radius: 5px;
@@ -118,34 +114,6 @@
         width: 100%;
       }
 
-      /* Search List */
-      .search-area {
-        position: relative;
-      }
-      .search-list {
-        position: absolute;
-        width: 100%;
-        background: white;
-        border: 1px solid #ddd;
-        z-index: 10;
-        max-height: 200px;
-        overflow-y: auto;
-        display: none;
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-      }
-      .search-item {
-        padding: 12px;
-        cursor: pointer;
-        border-bottom: 1px solid #eee;
-        display: flex;
-        justify-content: space-between;
-      }
-      .search-item:hover {
-        background: #f1f8ff;
-        color: var(--info);
-      }
-
-      /* Payment Section */
       .pay-section {
         background: #fffde7;
         padding: 20px;
@@ -154,92 +122,59 @@
         border: 1px solid #fbc02d;
         text-align: center;
       }
-      #qrBox {
-        display: none;
-        margin-top: 15px;
-      }
-      #qrBox img {
-        width: 180px;
-        border-radius: 10px;
-      }
 
-      /* Admin Panel */
-      #adminPanel {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: white;
-        z-index: 1000;
-        display: none;
-        padding: 30px;
-        box-sizing: border-box;
-        overflow-y: auto;
-      }
-      .stat-grid {
-        display: grid;
-        grid-template-columns: repeat(4, 1fr);
-        gap: 15px;
-        margin: 20px 0;
-      }
-      .stat-card {
-        background: var(--primary);
-        color: white;
-        padding: 20px;
-        border-radius: 8px;
-        text-align: center;
-      }
-
-      /* Thêm dòng này vào cuối phần <style> của file hoaqua.html */
+      /* Hỗ trợ xem điện thoại 9:16 */
       @media (max-width: 850px) {
         .main-content {
-          grid-template-columns: 1fr; /* Xếp dọc 9:16 */
+          grid-template-columns: 1fr;
         }
         nav {
           flex-direction: column;
           gap: 10px;
-        }
-        .stat-grid {
-          grid-template-columns: repeat(2, 1fr);
+          text-align: center;
         }
         .nav-btns {
           width: 100%;
           justify-content: center;
         }
       }
+      @media print {
+        .no-print {
+          display: none !important;
+        }
+      }
     </style>
   </head>
   <body>
     <nav class="no-print">
-      <div style="font-size: 20px; font-weight: bold">
-        🍎 CỬA HÀNG HOA QUẢ SẠCH
-      </div>
+      <div style="font-size: 20px; font-weight: bold">🍎 HOA QUẢ ÁI CỬ</div>
       <div class="nav-btns">
-        <a href="index.html" class="btn-home">🏠 Trang Tạp Hóa</a>
+        <a href="index.html" style="background: #546e7a">🏢 Về Tạp Hóa</a>
         <button onclick="openAdmin()" style="background: var(--info)">
-          📊 Báo cáo hoa quả
+          📊 Doanh Thu
         </button>
       </div>
     </nav>
 
     <div class="main-content no-print">
       <div class="card">
-        <h3>📦 Nhập Kho Hoa Quả</h3>
-        <div style="display: flex; gap: 10px">
-          <input type="text" id="inName" placeholder="Tên loại quả" />
-          <input type="number" id="inPrice" placeholder="Giá/1kg" />
-          <input type="number" id="inQty" step="0.1" placeholder="Số Kg nhập" />
-        </div>
-        <button class="btn-add" onclick="saveInv()">+ Thêm vào kho</button>
-
+        <h3>📦 Nhập Kho (Kg)</h3>
+        <input type="text" id="inName" placeholder="Tên loại trái cây" />
+        <input type="number" id="inPrice" placeholder="Giá bán / 1kg" />
+        <input
+          type="number"
+          id="inQty"
+          step="0.1"
+          placeholder="Số lượng kg nhập"
+        />
+        <button class="btn-add" onclick="saveInv()">+ Nhập hàng</button>
         <div class="table-wrapper">
           <table>
             <thead>
               <tr>
-                <th>Tên loại</th>
+                <th>Tên</th>
                 <th>Giá/Kg</th>
-                <th>Tồn (Kg)</th>
+                <th>Tồn</th>
                 <th>Xóa</th>
               </tr>
             </thead>
@@ -249,173 +184,143 @@
       </div>
 
       <div class="card">
-        <h3>🛒 Cân Ký & Bán Hàng</h3>
-        <div class="search-area">
-          <input
-            type="text"
-            id="shopSearch"
-            placeholder="🔍 Tìm tên trái cây..."
-            onkeyup="searchProduct()"
-          />
-          <div id="searchList" class="search-list"></div>
-        </div>
-
+        <h3>🛒 Cân Ký & Bán</h3>
+        <input
+          type="text"
+          id="shopSearch"
+          placeholder="🔍 Tìm trái cây..."
+          onkeyup="searchProduct()"
+        />
+        <div
+          id="searchList"
+          style="
+            background: white;
+            border: 1px solid #ddd;
+            display: none;
+            position: absolute;
+            z-index: 10;
+            width: 90%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+          "
+        ></div>
         <div class="table-wrapper">
           <table>
             <thead>
               <tr>
                 <th>Tên</th>
-                <th>Số Kg</th>
+                <th>Kg</th>
                 <th>Thành tiền</th>
-                <th>Hủy</th>
+                <th>Xóa</th>
               </tr>
             </thead>
             <tbody id="cartTableBody"></tbody>
           </table>
         </div>
-
         <div class="pay-section">
-          <h1 style="margin: 0; color: var(--danger)">
-            TỔNG: <span id="totalLabel">0</span> VNĐ
-          </h1>
-          <select id="payMethod" onchange="toggleQR()" style="margin-top: 15px">
-            <option value="cash">Tiền mặt</option>
-            <option value="qr">Chuyển khoản QR</option>
-          </select>
-
-          <div id="qrBox">
-            <img id="qrImg" src="" />
-            <br />
-            <button
-              class="btn-add"
-              style="
-                background: var(--info);
-                margin-top: 10px;
-                width: auto;
-                padding: 8px 20px;
-              "
-              onclick="hideQR()"
-            >
-              ✅ Đã nhận tiền
-            </button>
-          </div>
-
-          <button
-            class="btn-add"
-            style="
-              background: #ef6c00;
-              height: 55px;
-              font-size: 1.2rem;
-              margin-top: 15px;
-            "
-            onclick="finishSale()"
-          >
-            📠 IN HÓA ĐƠN & TRỪ KG
-          </button>
-        </div>
-      </div>
+    <h1 style="color: var(--danger); margin:0;">TỔNG: <span id="totalLabel">0</span>đ</h1>
+    
+    <div style="margin: 15px 0; display: flex; justify-content: center; gap: 20px;">
+        <label style="cursor:pointer"><input type="radio" name="payMethod" value="Tiền mặt" checked onclick="toggleQR(false)"> 💵 Tiền mặt</label>
+        <label style="cursor:pointer"><input type="radio" name="payMethod" value="Chuyển khoản" onclick="toggleQR(true)"> 💳 Chuyển khoản</label>
     </div>
 
-    <div id="adminPanel">
-      <div
-        style="
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          border-bottom: 2px solid #eee;
-          padding-bottom: 15px;
-        "
-      >
-        <h1>📈 Doanh Thu Bán Hoa Quả</h1>
-        <button
-          onclick="closeAdmin()"
-          style="
-            padding: 10px 25px;
-            background: var(--danger);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-          "
-        >
-          ĐÓNG X
-        </button>
-      </div>
-
-      <div class="stat-grid">
-        <div class="stat-card">
-          <h4>HÔM NAY</h4>
-          <p id="sumDay">0</p>
-        </div>
-        <div class="stat-card" style="background: #2e7d32">
-          <h4>TUẦN NÀY</h4>
-          <p id="sumWeek">0</p>
-        </div>
-        <div class="stat-card" style="background: #1565c0">
-          <h4>THÁNG NÀY</h4>
-          <p id="sumMonth">0</p>
-        </div>
-        <div class="stat-card" style="background: #ef6c00">
-          <h4>CẢ NĂM</h4>
-          <p id="sumYear">0</p>
-        </div>
-      </div>
-
-      <h3>Lịch sử bán hoa quả</h3>
-      <div class="table-wrapper" style="max-height: 500px">
-        <table>
-          <thead style="position: sticky; top: 0; background: #eee">
-            <tr>
-              <th>Thời gian</th>
-              <th>Sản phẩm</th>
-              <th>Tổng tiền</th>
-            </tr>
-          </thead>
-          <tbody id="historyBody"></tbody>
-        </table>
-      </div>
+    <div id="qrArea" style="display:none; margin-bottom: 15px; padding: 10px; border: 1px dashed #ccc; border-radius: 10px; background: #fff;">
+        <p style="font-size: 13px; font-weight: bold; color: #003d71; margin-bottom: 5px;">Ngân hàng MB - CU Y AI</p>
+        <img id="qrImg" src="" style="width: 200px; border-radius: 5px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+        <p style="font-size: 11px; color: #666; margin-top: 5px;">STK: 0386823702</p>
     </div>
 
-    <div id="printArea" class="print-area">
-      <center>
-        <h2>HÓA ĐƠN HOA QUẢ SẠCH</h2>
-        <p id="pDate"></p>
-      </center>
-      <hr />
-      <table style="width: 100%">
-        <tbody id="pItems"></tbody>
-      </table>
-      <hr />
-      <h3 id="pTotal" style="text-align: right"></h3>
-    </div>
+    <button class="btn-add" style="background: #27ae60; font-size: 18px;" onclick="finishSale()">✅ ĐÃ NHẬN TIỀN & XUẤT ĐƠN</button>
+    <button class="btn-add" style="background: #34495e; margin-top:5px;" onclick="copyInvoice()">📋 COPY ĐƠN</button>
+</div>
+    <footer
+      class="no-print"
+      style="
+        text-align: center;
+        padding: 20px;
+        color: #7f8c8d;
+        border-top: 1px solid #eee;
+      "
+    >
+      <p>© 2026 Bản quyền thuộc về Tạp Hóa ÁI CỬ</p>
+    </footer>
 
     <script>
-      let db = JSON.parse(localStorage.getItem("fruit_store_v1")) || {
-        products: [],
-        sales: [],
+      // --- CHÌA KHÓA FIREBASE CỦA BẠN ---
+      const firebaseConfig = {
+        apiKey: "AIzaSyA6OpgeqkYidXxlHQ1jhreVjagpzJ6F6II",
+        authDomain: "hoa-qua-70ecd.firebaseapp.com",
+        databaseURL: "https://hoa-qua-70ecd-default-rtdb.firebaseio.com",
+        projectId: "hoa-qua-70ecd",
+        storageBucket: "hoa-qua-70ecd.firebasestorage.app",
+        messagingSenderId: "434483280531",
+        appId: "1:434483280531:web:2ce63fcddf3cdf2c28eb66",
       };
+
+      firebase.initializeApp(firebaseConfig);
+      const database = firebase.database();
+
+      let db = { products: [], sales: [] };
       let cart = [];
 
+      // Tự động tải dữ liệu từ Cloud mỗi khi có thay đổi
+      database.ref("hoaqua_data").on("value", (snap) => {
+        const data = snap.val();
+        if (data) {
+          db = data;
+          if (!db.sales) db.sales = [];
+          renderInv();
+        }
+      });
+
       function saveInv() {
-        const name = document.getElementById("inName").value;
+        const name = document.getElementById("inName").value.trim();
         const price = parseInt(document.getElementById("inPrice").value);
         const qty = parseFloat(document.getElementById("inQty").value);
-        if (!name || isNaN(price)) return;
-        db.products.push({ name, price, qty });
-        update();
+
+        if (!name || isNaN(price) || isNaN(qty))
+          return alert("Vui lòng nhập đủ thông tin!");
+        if (!db.products) db.products = [];
+
+        // KIỂM TRA TRÙNG TÊN
+        const existingProduct = db.products.find(
+          (p) => p.name.toLowerCase() === name.toLowerCase(),
+        );
+
+        if (existingProduct) {
+          // Cộng dồn số Kg
+          existingProduct.qty = parseFloat(
+            (existingProduct.qty + qty).toFixed(2),
+          );
+          existingProduct.price = price;
+          alert(`Đã cộng dồn thêm ${qty}kg vào [${name}]`);
+        } else {
+          db.products.push({ name, price, qty });
+        }
+
+        updateCloud();
         document.getElementById("inName").value = "";
         document.getElementById("inPrice").value = "";
         document.getElementById("inQty").value = "";
       }
 
       function renderInv() {
+        if (!db.products) return;
         document.getElementById("invTableBody").innerHTML = db.products
           .map(
             (p, i) => `
-            <tr><td>${p.name}</td><td>${p.price.toLocaleString()}</td><td><b>${p.qty} kg</b></td>
-            <td><button onclick="db.products.splice(${i},1);update()" style="color:red; border:none; background:none; cursor:pointer">Xóa</button></td></tr>`,
+            <tr><td>${p.name}</td><td>${p.price.toLocaleString()}</td><td><b>${p.qty}kg</b></td>
+            <td onclick="deleteItem(${i})" style="color:red; cursor:pointer">✖</td></tr>
+        `,
           )
           .join("");
+      }
+
+      function deleteItem(i) {
+        if (confirm("Xóa loại quả này khỏi kho?")) {
+          db.products.splice(i, 1);
+          updateCloud();
+        }
       }
 
       function searchProduct() {
@@ -429,26 +334,30 @@
           p.name.toLowerCase().includes(key),
         );
         list.innerHTML = matches
-          .map((p) => {
-            const idx = db.products.indexOf(p);
-            return `<div class="search-item" onclick="addCart(${idx})"><span>${p.name}</span><b>${p.price.toLocaleString()}đ/Kg (Còn:${p.qty}kg)</b></div>`;
-          })
+          .map(
+            (p) => `
+            <div style="padding:12px; border-bottom:1px solid #eee; cursor:pointer" onclick="addCart('${p.name}')">
+                ${p.name} - ${p.price.toLocaleString()}đ/kg (Tồn: ${p.qty}kg)
+            </div>
+        `,
+          )
           .join("");
         list.style.display = "block";
       }
 
-      function addCart(idx) {
-        const item = db.products[idx];
-        const num = prompt(`Nhập số Kg cho [${item.name}]:`, 0.5);
-        const qty = parseFloat(num);
-        if (!qty || qty <= 0 || qty > item.qty)
-          return alert("Số cân không hợp lệ!");
+      function addCart(name) {
+        const p = db.products.find((x) => x.name === name);
+        const qty = parseFloat(
+          prompt(`Nhập số Kg khách mua cho [${p.name}]:`, 1),
+        );
+        if (isNaN(qty) || qty <= 0) return;
+        if (qty > p.qty) return alert("Kho không đủ hàng!");
         cart.push({
-          idx,
-          name: item.name,
-          price: item.price,
-          qty,
-          total: Math.round(item.price * qty),
+          name: p.name,
+          price: p.price,
+          qty: qty,
+          total: Math.round(p.price * qty),
+          idx: db.products.indexOf(p),
         });
         document.getElementById("searchList").style.display = "none";
         document.getElementById("shopSearch").value = "";
@@ -458,123 +367,182 @@
       function renderCart() {
         let total = 0;
         document.getElementById("cartTableBody").innerHTML = cart
-          .map((item, i) => {
-            total += item.total;
-            return `<tr><td>${item.name}</td><td>${item.qty} kg</td><td>${item.total.toLocaleString()}</td>
-            <td><button onclick="cart.splice(${i},1);renderCart()" style="border:none;background:none;color:red;cursor:pointer">✖</button></td></tr>`;
+          .map((c, i) => {
+            total += c.total;
+            return `<tr><td>${c.name}</td><td>${c.qty}kg</td><td>${c.total.toLocaleString()}</td><td onclick="cart.splice(${i},1);renderCart()">✖</td></tr>`;
           })
           .join("");
         document.getElementById("totalLabel").innerText =
           total.toLocaleString();
-        if (document.getElementById("payMethod").value === "qr")
-          updateQR(total);
       }
-
-      function updateQR(amount) {
-        document.getElementById("qrImg").src =
-          `https://img.vietqr.io/image/MB-0987654321-compact.png?amount=${amount}&addInfo=HoaQuaSach`;
-      }
-
-      function toggleQR() {
-        const m = document.getElementById("payMethod").value;
-        document.getElementById("qrBox").style.display =
-          m === "qr" ? "block" : "none";
-        renderCart();
-      }
-
-      function hideQR() {
-        document.getElementById("qrBox").style.display = "none";
-      }
+      function toggleQR(show) {
+    const qrArea = document.getElementById('qrArea');
+    const qrImg = document.getElementById('qrImg');
+    const totalText = document.getElementById('totalLabel').innerText.replace(/,/g, '');
+    const total = parseInt(totalText);
+    
+    if (show && total > 0) {
+        // Lấy số thứ tự đơn hàng hiện tại từ database, nếu chưa có thì bắt đầu từ 1
+        // Định dạng số thành chuỗi 6 chữ số (ví dụ: 000001)
+        const orderNum = (db.orderCount || 0) + 1;
+        const orderCode = orderNum.toString().padStart(6, '0');
+        
+        // Tạo link QR với nội dung là mã đơn hàng
+        const qrUrl = `https://img.vietqr.io/image/mb-0386823702-compact2.jpg?amount=${total}&addInfo=DH${orderCode}&accountName=CU Y AI`;
+        
+        qrImg.src = qrUrl;
+        qrArea.style.display = 'block';
+        // Lưu mã tạm thời để tí nữa lưu vào lịch sử sale
+        window.currentOrderCode = "DH" + orderCode;
+    } else {
+        qrArea.style.display = 'none';
+    }
+}
 
       function finishSale() {
-        if (cart.length === 0) return;
-        const now = new Date();
-        let sale = {
-          timestamp: now.getTime(),
-          timeStr: now.toLocaleString(),
-          items: cart.map((c) => `${c.name}(${c.qty}kg)`).join(", "),
-          total: cart.reduce((s, i) => s + i.total, 0),
-        };
-        cart.forEach((c) => {
-          db.products[c.idx].qty = (db.products[c.idx].qty - c.qty).toFixed(2);
-        });
-        db.sales.push(sale);
+    if (cart.length === 0) return alert("Giỏ hàng trống!");
+    
+    const method = document.querySelector('input[name="payMethod"]:checked').value;
+    const now = new Date();
+    
+    // Tăng số thứ tự đơn hàng
+    if (!db.orderCount) db.orderCount = 0;
+    db.orderCount += 1;
+    const orderCode = db.orderCount.toString().padStart(6, '0');
 
-        document.getElementById("pDate").innerText = sale.timeStr;
-        document.getElementById("pItems").innerHTML = cart
-          .map(
-            (i) =>
-              `<tr><td>${i.name}</td><td>${i.qty}kg</td><td>${i.total.toLocaleString()}đ</td></tr>`,
-          )
-          .join("");
-        document.getElementById("pTotal").innerText =
-          "TỔNG: " + sale.total.toLocaleString() + "đ";
-        window.print();
+    // QUAN TRỌNG: Xác định nội dung hiển thị
+    // Nếu là Chuyển khoản thì hiện mã DH000... - Nếu là Tiền mặt thì hiện "Tiền mặt"
+    const paymentNote = (method === "Chuyển khoản") ? "DH" + orderCode : "Tiền mặt";
 
-        cart = [];
-        update();
-        renderCart();
-        hideQR();
+    const sale = {
+        timestamp: now.getTime(),
+        timeStr: now.toLocaleString(),
+        orderId: paymentNote, // Lưu nội dung này vào database
+        total: cart.reduce((a, b) => a + b.total, 0),
+        items: cart.map(c => `${c.name}(${c.qty})`).join(', '),
+        method: method
+    };
+
+    // ... (phần trừ kho và db.sales.push giữ nguyên) ...
+    db.sales.push(sale);
+    updateCloud();
+    alert("Thanh toán thành công: " + paymentNote);
+    
+    cart = []; renderCart(); toggleQR(false);
+}
+
+      function copyInvoice() {
+        if (cart.length === 0) return alert("Giỏ hàng trống!");
+        let text =
+          "--- HÓA ĐƠN HOA QUẢ ---\n" +
+          cart
+            .map((c) => `${c.name} x ${c.qty}kg: ${c.total.toLocaleString()}đ`)
+            .join("\n");
+        text +=
+          "\nTỔNG CỘNG: " +
+          document.getElementById("totalLabel").innerText +
+          " VNĐ";
+        text += "\n\n© 2026 Bản quyền thuộc về Tên Của Bạn";
+        navigator.clipboard
+          .writeText(text)
+          .then(() => alert("Đã copy hóa đơn kèm thương hiệu!"));
+      }
+
+      function updateCloud() {
+        database.ref("hoaqua_data").set(db);
       }
 
       function openAdmin() {
-        const p = prompt("Mật khẩu quản lý:");
-        if (p !== "123") return;
-        document.getElementById("adminPanel").style.display = "block";
-        calculateStats();
-        document.getElementById("historyBody").innerHTML = db.sales
-          .slice()
-          .reverse()
-          .map(
-            (s) =>
-              `<tr><td>${s.timeStr}</td><td>${s.items}</td><td><b>${s.total.toLocaleString()}đ</b></td></tr>`,
-          )
-          .join("");
-      }
+        const pass = prompt("Nhập mật khẩu quản lý:");
+        if (pass !== "123") return alert("Sai mật khẩu!");
 
-      function calculateStats() {
+        // 1. Tính toán số liệu doanh thu
         const now = new Date();
-        const sDay = new Date().setHours(0, 0, 0, 0);
-        const sWeek = new Date(
-          now.setDate(now.getDate() - now.getDay()),
-        ).setHours(0, 0, 0, 0);
-        const sMonth = new Date(now.getFullYear(), now.getMonth(), 1).getTime();
-        const sYear = new Date(now.getFullYear(), 0, 1).getTime();
-        const sum = (t) =>
-          db.sales
-            .filter((s) => s.timestamp >= t)
-            .reduce((a, b) => a + b.total, 0);
-        document.getElementById("sumDay").innerText =
-          sum(sDay).toLocaleString() + "đ";
-        document.getElementById("sumWeek").innerText =
-          sum(sWeek).toLocaleString() + "đ";
-        document.getElementById("sumMonth").innerText =
-          sum(sMonth).toLocaleString() + "đ";
-        document.getElementById("sumYear").innerText =
-          sum(sYear).toLocaleString() + "đ";
-      }
+        const startOfDay = new Date(now.setHours(0, 0, 0, 0)).getTime();
 
-      function closeAdmin() {
-        document.getElementById("adminPanel").style.display = "none";
+        // Tính đầu tuần (Thứ 2)
+        const dayOfWeek = now.getDay() || 7;
+        const startOfWeek = new Date(
+          now.setDate(now.getDate() - dayOfWeek + 1),
+        ).setHours(0, 0, 0, 0);
+
+        // Tính đầu tháng và đầu năm
+        const startOfMonth = new Date(
+          now.getFullYear(),
+          now.getMonth(),
+          1,
+        ).getTime();
+        const startOfYear = new Date(now.getFullYear(), 0, 1).getTime();
+
+        let sumDay = 0,
+          sumWeek = 0,
+          sumMonth = 0,
+          sumYear = 0;
+
+        (db.sales || []).forEach((s) => {
+          const t = s.timestamp;
+          if (t >= startOfDay) sumDay += s.total;
+          if (t >= startOfWeek) sumWeek += s.total;
+          if (t >= startOfMonth) sumMonth += s.total;
+          if (t >= startOfYear) sumYear += s.total;
+        });
+
+        // 2. Tạo giao diện hiển thị 4 ô thống kê và bảng lịch sử
+        let reportHtml = `
+        <div id="reportModal" style="position:fixed; top:0; left:0; width:100%; height:100%; background:#f4f7f6; z-index:9999; padding:20px; overflow-y:auto; font-family:sans-serif;">
+            <div style="max-width:1000px; margin:auto; background:white; padding:20px; border-radius:15px; box-shadow:0 10px 30px rgba(0,0,0,0.1);">
+                <button onclick="document.getElementById('reportModal').remove()" style="float:right; padding:8px 15px; background:#e74c3c; color:white; border:none; border-radius:5px; cursor:pointer;">ĐÓNG [X]</button>
+                <h2 style="color:#2c3e50; text-align:center;">📊 BÁO CÁO DOANH THU TỔNG HỢP</h2>
+                
+                <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap:15px; margin-bottom:30px;">
+                    <div style="background:#3498db; color:white; padding:20px; border-radius:10px; text-align:center;">
+                        <div style="font-size:14px; opacity:0.8;">HÔM NAY</div>
+                        <div style="font-size:24px; font-weight:bold;">${sumDay.toLocaleString()}đ</div>
+                    </div>
+                    <div style="background:#27ae60; color:white; padding:20px; border-radius:10px; text-align:center;">
+                        <div style="font-size:14px; opacity:0.8;">TUẦN NÀY</div>
+                        <div style="font-size:24px; font-weight:bold;">${sumWeek.toLocaleString()}đ</div>
+                    </div>
+                    <div style="background:#f39c12; color:white; padding:20px; border-radius:10px; text-align:center;">
+                        <div style="font-size:14px; opacity:0.8;">THÁNG NÀY</div>
+                        <div style="font-size:24px; font-weight:bold;">${sumMonth.toLocaleString()}đ</div>
+                    </div>
+                    <div style="background:#8e44ad; color:white; padding:20px; border-radius:10px; text-align:center;">
+                        <div style="font-size:14px; opacity:0.8;">NĂM ${now.getFullYear()}</div>
+                        <div style="font-size:24px; font-weight:bold;">${sumYear.toLocaleString()}đ</div>
+                    </div>
+                </div>
+
+                <h3>📜 Lịch sử giao dịch</h3>
+                <div style="overflow-x:auto;">
+                    
+<table border="1" style="width:100%; border-collapse:collapse; border-color:#eee;">
+    <thead>
+        <tr style="background:#f8f9fa;">
+            <th style="padding:12px;">Thời gian</th>
+            <th style="padding:12px;">Nội dung/Mã đơn</th> <th style="padding:12px;">Chi tiết sản phẩm</th>
+            <th style="padding:12px;">Thành tiền</th>
+        </tr>
+    </thead>
+    <tbody>
+        ${(db.sales || []).slice().reverse().map(s => `
+            <tr>
+                <td style="padding:10px; border-bottom:1px solid #eee;">${s.timeStr}</td>
+                <td style="padding:10px; border-bottom:1px solid #eee; font-weight:bold; color:#e67e22;">
+                    ${s.orderId || s.method || '---'} 
+                </td>
+                <td style="padding:10px; border-bottom:1px solid #eee;">${s.items}</td>
+                <td style="padding:10px; border-bottom:1px solid #eee; font-weight:bold;">${s.total.toLocaleString()}đ</td>
+            </tr>
+        `).join('')}
+    </tbody>
+</table>
+                </div>
+            </div>
+        </div>
+    `;
+        document.body.insertAdjacentHTML("beforeend", reportHtml);
       }
-      function update() {
-        localStorage.setItem("fruit_store_v1", JSON.stringify(db));
-        renderInv();
-      }
-      renderInv();
     </script>
-    <footer
-      class="no-print"
-      style="
-        text-align: center;
-        padding: 20px;
-        color: #7f8c8d;
-        font-size: 14px;
-        margin-top: 30px;
-        border-top: 1px solid #eee;
-      "
-    >
-      <p>© 2026 Bản quyền thuộc về Tạp Hóa ÁI CỬ</p>
-    </footer>
   </body>
 </html>
