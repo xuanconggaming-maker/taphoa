@@ -1,5 +1,5 @@
 // Thiết lập mật khẩu quản lý tại đây
-const correctPass = "1234";
+const correctPass = "1985";
 
 function checkAdminPass() {
   const input = document.getElementById("adminPass").value;

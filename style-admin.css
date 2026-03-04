@@ -98,3 +98,50 @@ td {
   padding: 10px;
   border-bottom: 1px solid #eee;
 }
+/* Hỗ trợ điện thoại (9:16) */
+@media (max-width: 850px) {
+  .grid-layout {
+    grid-template-columns: 1fr; /* Chỉ còn 1 cột duy nhất */
+  }
+
+  header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .container {
+    padding: 10px;
+  }
+
+  .card {
+    padding: 15px;
+  }
+
+  /* Làm cho bảng dễ nhìn hơn trên mobile */
+  table {
+    font-size: 13px;
+  }
+}
+/* --- Hỗ trợ điện thoại (9:16) và màn hình nhỏ --- */
+@media (max-width: 850px) {
+  .grid-layout {
+    grid-template-columns: 1fr; /* Chuyển 2 cột Admin thành 1 cột dọc */
+  }
+
+  header {
+    flex-direction: column;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr; /* Các ô doanh thu xếp chồng lên nhau */
+  }
+
+  .scroll-table {
+    height: auto;
+    max-height: 300px;
+    overflow-x: auto; /* Cho phép vuốt ngang bảng nếu bảng quá rộng */
+  }
+}

@@ -53,12 +53,34 @@ nav {
 }
 
 /* --- Bố cục chính --- */
-.main-content {
-  display: flex;
-  flex: 1;
-  overflow: hidden;
-  padding: 20px;
-  gap: 20px;
+/* Hỗ trợ điện thoại (9:16) */
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column; /* Chuyển từ ngang sang dọc */
+    overflow-y: auto;
+    height: auto;
+  }
+
+  .left-side,
+  .right-side {
+    flex: none;
+    width: 100%; /* Chiếm hết chiều ngang */
+    height: auto;
+    max-height: none;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr); /* Chia 2 cột sản phẩm thay vì 4 */
+    gap: 10px;
+  }
+
+  nav {
+    padding: 10px 15px;
+  }
+
+  .logo {
+    font-size: 1.1rem;
+  }
 }
 
 /* --- Bên trái: Danh sách sản phẩm --- */
@@ -350,4 +372,59 @@ nav {
   background-color: var(--danger-color);
   color: white;
   box-shadow: 0 6px 12px rgba(231, 76, 60, 0.3);
+}
+/* --- Hỗ trợ điện thoại (9:16) và màn hình nhỏ --- */
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column; /* Chuyển từ hàng ngang sang hàng dọc */
+    overflow-y: auto;
+    height: auto;
+  }
+
+  .left-side,
+  .right-side {
+    flex: none;
+    width: 100%; /* Giãn rộng 100% màn hình */
+    max-height: none;
+  }
+
+  .grid {
+    grid-template-columns: repeat(
+      2,
+      1fr
+    ); /* Hiện 2 cột sản phẩm trên điện thoại */
+    gap: 10px;
+  }
+
+  nav {
+    padding: 10px 15px;
+  }
+}
+/* --- Hỗ trợ điện thoại (9:16) và màn hình nhỏ --- */
+@media (max-width: 768px) {
+  .main-content {
+    flex-direction: column; /* Chuyển từ ngang sang dọc */
+    overflow-y: auto;
+    height: auto;
+  }
+
+  .left-side,
+  .right-side {
+    flex: none;
+    width: 100%; /* Chiếm hết chiều ngang điện thoại */
+    max-height: none;
+  }
+
+  .grid {
+    grid-template-columns: repeat(2, 1fr); /* Hiện 2 cột sản phẩm mỗi hàng */
+    gap: 10px;
+  }
+
+  nav {
+    padding: 10px 15px;
+  }
+
+  .logo {
+    font-size: 1.2rem;
+  }
 }
