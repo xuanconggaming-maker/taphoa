@@ -1,0 +1,353 @@
+/* --- Tổng thể --- */
+:root {
+  --primary-color: #2c3e50; /* Xanh Navy đậm - Chuyên nghiệp */
+  --accent-color: #27ae60; /* Xanh lá - Hành động tích cực (Thêm/Thanh toán) */
+  --danger-color: #e74c3c; /* Đỏ - Hành động hủy/xóa */
+  --info-color: #3498db; /* Xanh dương - Thông tin/QR */
+  --bg-color: #f0f2f5; /* Xám nhạt - Nền */
+  --text-color: #333; /* Đen xám - Chữ chính */
+  --card-bg: #ffffff; /* Trắng - Nền thẻ */
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  margin: 0;
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+/* --- Thanh điều hướng (Nav) --- */
+nav {
+  background: var(--primary-color);
+  color: white;
+  padding: 15px 25px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+.logo {
+  font-size: 1.6rem;
+  font-weight: bold;
+  letter-spacing: 1px;
+}
+
+.btn-admin {
+  color: white;
+  text-decoration: none;
+  border: 1.5px solid rgba(255, 255, 255, 0.7);
+  padding: 8px 18px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.btn-admin:hover {
+  background: white;
+  color: var(--primary-color);
+}
+
+/* --- Bố cục chính --- */
+.main-content {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+  padding: 20px;
+  gap: 20px;
+}
+
+/* --- Bên trái: Danh sách sản phẩm --- */
+.left-side {
+  flex: 2;
+  display: flex;
+  flex-direction: column;
+}
+
+#search {
+  width: 100%;
+  padding: 12px 20px;
+  margin-bottom: 20px;
+  border: none;
+  border-radius: 25px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  font-size: 1rem;
+  outline: none;
+  transition: box-shadow 0.3s ease;
+}
+
+#search:focus {
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  overflow-y: auto;
+  padding-right: 5px; /* Tránh đè lên scrollbar */
+}
+
+.product-card {
+  background: var(--card-bg);
+  padding: 18px;
+  border-radius: 12px;
+  text-align: center;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease;
+  border: 1px solid #eee;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.product-card b {
+  display: block;
+  font-size: 1.1rem;
+  margin-bottom: 8px;
+  height: 2.8rem; /* Đảm bảo tên dài không làm vỡ bố cục */
+  overflow: hidden;
+}
+
+.p-price {
+  color: var(--accent-color);
+  font-weight: bold;
+  font-size: 1.3rem;
+  display: block;
+  margin-bottom: 12px;
+}
+
+.product-card p {
+  margin: 0 0 10px 0;
+  font-size: 0.9rem;
+  color: #777;
+}
+
+.product-card input {
+  width: 60px;
+  padding: 8px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.product-card button {
+  width: 100%;
+  background: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background 0.3s ease;
+}
+
+.product-card button:hover {
+  background: #2ecc71;
+}
+
+/* --- Bên phải: Giỏ hàng --- */
+.right-side {
+  flex: 1;
+  background: var(--card-bg);
+  padding: 25px;
+  border-radius: 15px;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+}
+
+.right-side h3 {
+  margin-top: 0;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+}
+
+.cart-list {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: 15px;
+}
+
+.cart-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px dashed #eee;
+  font-size: 1rem;
+}
+
+.cart-item button {
+  background: none;
+  border: none;
+  color: var(--danger-color);
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: color 0.3s ease;
+}
+
+.cart-item button:hover {
+  color: #c0392b;
+}
+
+.total {
+  font-size: 1.6rem;
+  font-weight: bold;
+  text-align: right;
+  margin-bottom: 25px;
+  border-top: 2px solid #eee;
+  padding-top: 15px;
+}
+
+#totalText {
+  color: var(--danger-color);
+}
+
+/* --- Nút hành động thanh toán chính --- */
+.payment-actions {
+  margin-top: auto; /* Đẩy xuống dưới cùng */
+}
+
+.payment-actions button {
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 12px;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition:
+    background 0.3s ease,
+    transform 0.1s ease;
+}
+
+.payment-actions button:active {
+  transform: scale(0.98);
+}
+
+.btn-pay.cash {
+  background: var(--accent-color);
+  color: white;
+}
+.btn-pay.cash:hover {
+  background: #2ecc71;
+}
+
+.btn-pay.qr {
+  background: var(--info-color);
+  color: white;
+}
+.btn-pay.qr:hover {
+  background: #5dade2;
+}
+
+/* --- Modal QR & Các nút trong Modal (PHẦN CHÍNH CẦN CHỈNH) --- */
+.modal {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.7); /* Nền tối mờ chuyên nghiệp */
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: white;
+  padding: 35px;
+  border-radius: 20px;
+  text-align: center;
+  max-width: 400px;
+  width: 90%;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.modal-content h3 {
+  margin: 0 0 10px 0;
+}
+
+#qrImg {
+  width: 100%;
+  max-width: 250px;
+  margin: 0 auto;
+  border-radius: 10px;
+  border: 1px solid #eee;
+}
+
+.qr-memo-box {
+  background: #fff3cd;
+  color: #856404;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ffeeba;
+  font-size: 0.9rem;
+}
+
+/* --- Bố cục nút trong Modal --- */
+.modal-btns {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  justify-content: center;
+}
+
+/* --- Định dạng nút chung trong Modal --- */
+.modal-btns button {
+  flex: 1; /* Hai nút bằng nhau */
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition:
+    background 0.3s ease,
+    box-shadow 0.2s ease,
+    transform 0.1s ease;
+}
+
+.modal-btns button:active {
+  transform: scale(0.98);
+}
+
+/* Nút Chuyển khoản (Xác nhận) - Màu Xanh dương chuyên nghiệp */
+.btn-confirm-pay {
+  background-color: var(--info-color);
+  color: white;
+  box-shadow: 0 4px 6px rgba(52, 152, 219, 0.2);
+}
+
+.btn-confirm-pay:hover {
+  background-color: #5dade2;
+  box-shadow: 0 6px 12px rgba(52, 152, 219, 0.3);
+}
+
+/* Nút Hủy - Màu Đỏ rõ ràng */
+.btn-close-modal {
+  background-color: #eee;
+  color: #555;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+
+.btn-close-modal:hover {
+  background-color: var(--danger-color);
+  color: white;
+  box-shadow: 0 6px 12px rgba(231, 76, 60, 0.3);
+}

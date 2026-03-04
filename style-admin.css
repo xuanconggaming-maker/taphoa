@@ -1,0 +1,100 @@
+:root {
+  --p: #2c3e50;
+  --s: #27ae60;
+  --bg: #f4f7f6;
+}
+body {
+  font-family: "Segoe UI", sans-serif;
+  background: var(--bg);
+  margin: 0;
+  padding: 20px;
+}
+.container {
+  max-width: 1200px;
+  margin: auto;
+}
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+.btn-nav {
+  background: var(--p);
+  color: white;
+  text-decoration: none;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: bold;
+  font-size: 14px;
+}
+.grid-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+.card {
+  background: white;
+  padding: 20px;
+  border-radius: 15px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+}
+.form-group input {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+.btn-add {
+  background: var(--s);
+  color: white;
+  width: 100%;
+  border: none;
+  padding: 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: bold;
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 20px;
+}
+.stat-item {
+  padding: 15px;
+  border-radius: 10px;
+  color: white;
+  text-align: center;
+}
+.bg-blue {
+  background: #3498db;
+}
+.bg-green {
+  background: #1abc9c;
+}
+.scroll-table {
+  height: 400px;
+  overflow-y: auto;
+  border: 1px solid #eee;
+  margin-top: 10px;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+th {
+  position: sticky;
+  top: 0;
+  background: #f8f9fa;
+  padding: 10px;
+  border-bottom: 2px solid #eee;
+  text-align: left;
+}
+td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}

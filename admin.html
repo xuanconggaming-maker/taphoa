@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Quản Lý Cửa Hàng - Tạp Hóa AI</title>
+    <link rel="stylesheet" href="style-admin.css" />
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
+  </head>
+  <body>
+    <div
+      id="adminLock"
+      style="
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: #2c3e50;
+        z-index: 9999;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        color: white;
+      "
+    >
+      <h2 style="margin-bottom: 20px">🔒 QUẢN TRỊ VIÊN</h2>
+      <input
+        type="password"
+        id="adminPass"
+        placeholder="Nhập mật khẩu..."
+        style="
+          padding: 12px;
+          border-radius: 8px;
+          border: none;
+          width: 250px;
+          text-align: center;
+          font-size: 1.1rem;
+        "
+      />
+      <button
+        onclick="checkAdminPass()"
+        style="
+          margin-top: 15px;
+          padding: 10px 25px;
+          background: #27ae60;
+          color: white;
+          border: none;
+          border-radius: 8px;
+          cursor: pointer;
+          font-weight: bold;
+        "
+      >
+        ĐĂNG NHẬP
+      </button>
+      <p id="lockError" style="color: #ff7675; margin-top: 15px; display: none">
+        Mật khẩu không chính xác!
+      </p>
+    </div>
+    <div class="container">
+      <header>
+        <h2>⚙️ HỆ THỐNG QUẢN TRỊ</h2>
+        <a href="index.html" class="btn-nav">🛒 VỀ TRANG BÁN HÀNG</a>
+      </header>
+
+      <div class="grid-layout">
+        <div class="card">
+          <h3>📦 Nhập Hàng Mới</h3>
+          <div class="form-group">
+            <input
+              type="text"
+              id="pName"
+              placeholder="Tên sản phẩm (VD: Bia Saigon)"
+            />
+            <input type="number" id="pPrice" placeholder="Giá bán (đ)" />
+            <input
+              type="number"
+              id="pQty"
+              placeholder="Số lượng nhập (VD: 24)"
+            />
+            <button
+              class="btn-add"
+              id="btnAddProduct"
+              onclick="addNewProduct()"
+            >
+              XÁC NHẬN THÊM
+            </button>
+          </div>
+          <div class="scroll-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Sản phẩm</th>
+                  <th>Giá</th>
+                  <th>Tồn</th>
+                  <th>Xóa</th>
+                </tr>
+              </thead>
+              <tbody id="inventoryBody">
+                <tr>
+                  <td colspan="4" style="text-align: center">
+                    Đang tải dữ liệu...
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>📊 Doanh Thu & Lịch Sử</h3>
+          <div class="stats-grid">
+            <div class="stat-item bg-blue">
+              Hôm nay<br /><b id="totalDay">0đ</b>
+            </div>
+            <div class="stat-item bg-green">
+              Tháng này<br /><b id="totalMonth">0đ</b>
+            </div>
+          </div>
+          <div class="scroll-table">
+            <table>
+              <thead>
+                <tr>
+                  <th>Thời gian</th>
+                  <th>Mã đơn</th>
+                  <th>Tổng tiền</th>
+                  <th>Chi tiết</th>
+                </tr>
+              </thead>
+              <tbody id="historyBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script src="script-admin.js"></script>
+  </body>
+</html>
