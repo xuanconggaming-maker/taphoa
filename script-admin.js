@@ -7,7 +7,6 @@ function checkAdminPass() {
   const errorText = document.getElementById("lockError");
 
   if (input === correctPass) {
-    // Nếu đúng mật khẩu, ẩn màn hình khóa và lưu trạng thái vào Session
     lockScreen.style.display = "none";
     sessionStorage.setItem("isAdmin", "true");
   } else {
@@ -16,14 +15,14 @@ function checkAdminPass() {
   }
 }
 
-// Kiểm tra nếu đã đăng nhập trước đó trong cùng một phiên làm việc (session)
+// Kiểm tra phiên làm việc
 window.onload = function () {
   if (sessionStorage.getItem("isAdmin") === "true") {
     document.getElementById("adminLock").style.display = "none";
   }
 };
 
-// Cho phép nhấn phím Enter để đăng nhập
+// Cho phép Enter
 document.addEventListener("keypress", function (e) {
   if (
     e.key === "Enter" &&
@@ -32,6 +31,7 @@ document.addEventListener("keypress", function (e) {
     checkAdminPass();
   }
 });
+
 // 1. Cấu hình Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyA_1WA2ArsM0_atwF2BmtSBw_hl6g2GUJE",
@@ -44,21 +44,16 @@ const firebaseConfig = {
   appId: "1:610047403458:web:b5d320ea25e18393c6625b",
 };
 
-// Khởi tạo Firebase
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// Biến cục bộ để lưu trữ dữ liệu tạm thời
 let localDB = { products: [] };
 
-// 2. Lắng nghe dữ liệu thay đổi từ Firebase (Realtime)
+// 2. Lắng nghe dữ liệu (Realtime)
 database.ref().on(
   "value",
   (snapshot) => {
     const data = snapshot.val() || {};
-    console.log("Dữ liệu mới nhận từ Firebase:", data);
-
-    // Cập nhật dữ liệu hàng hóa
     localDB = data.store_data_v3 || { products: [] };
     if (!Array.isArray(localDB.products)) localDB.products = [];
 
@@ -66,12 +61,11 @@ database.ref().on(
     renderSalesHistory(data.sales_history || {});
   },
   (error) => {
-    console.error("Lỗi kết nối Firebase:", error);
     alert("Không thể kết nối cơ sở dữ liệu!");
   },
 );
 
-// 3. Hàm Thêm Sản Phẩm Mới
+// 3. Hàm Thêm
 function addNewProduct() {
   const nameInput = document.getElementById("pName");
   const priceInput = document.getElementById("pPrice");
@@ -81,76 +75,71 @@ function addNewProduct() {
   const price = parseInt(priceInput.value);
   const qty = parseFloat(qtyInput.value) || 0;
 
-  // Kiểm tra hợp lệ
-  if (!name) {
-    alert("Vui lòng nhập tên sản phẩm!");
-    return;
-  }
-  if (isNaN(price) || price <= 0) {
-    alert("Giá sản phẩm phải là số dương!");
-    return;
-  }
+  if (!name) return alert("Vui lòng nhập tên sản phẩm!");
+  if (isNaN(price) || price <= 0)
+    return alert("Giá sản phẩm phải là số dương!");
 
-  // Vô hiệu hóa nút để tránh bấm nhiều lần
   const btn = document.getElementById("btnAddProduct");
   btn.disabled = true;
-  btn.innerText = "ĐANG LƯU...";
+  btn.innerText = "⏳ ĐANG LƯU...";
 
-  // Cập nhật mảng sản phẩm
   localDB.products.push({ name, price, qty });
 
-  // Lưu lên Firebase
   database
     .ref("store_data_v3")
     .set(localDB)
     .then(() => {
       alert("Đã thêm thành công: " + name);
-      // Xóa trắng ô nhập
       nameInput.value = "";
       priceInput.value = "";
       qtyInput.value = "";
     })
-    .catch((err) => {
-      console.error("Lỗi khi lưu:", err);
-      alert("Lỗi: " + err.message);
-    })
+    .catch((err) => alert("Lỗi: " + err.message))
     .finally(() => {
       btn.disabled = false;
-      btn.innerText = "XÁC NHẬN THÊM";
+      btn.innerText = "➕ XÁC NHẬN THÊM";
     });
 }
 
-// 4. Hiển thị bảng hàng tồn kho
+// 4. Hiển thị bảng hàng
 function renderInventory() {
   const tbody = document.getElementById("inventoryBody");
   if (localDB.products.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center">Chưa có hàng trong kho</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="4" class="text-center">Chưa có hàng trong kho</td></tr>`;
     return;
   }
 
   tbody.innerHTML = localDB.products
-    .map(
-      (p, i) => `
+    .map((p, i) => {
+      // Highlight màu đỏ nếu hết hàng
+      const qtyStyle =
+        p.qty <= 0
+          ? "color: red; font-weight: bold;"
+          : "color: #27ae60; font-weight: bold;";
+
+      return `
         <tr>
             <td><b>${p.name}</b></td>
-            <td>${p.price.toLocaleString()}đ</td>
-            <td>${p.qty}</td>
-            <td><button onclick="deleteProduct(${i})" style="color:red; background:none; border:none; cursor:pointer; font-size:18px">✖</button></td>
+            <td style="color: #e74c3c; font-weight: 600;">${p.price.toLocaleString()}đ</td>
+            <td style="${qtyStyle}">${p.qty}</td>
+            <td><button class="btn-delete" onclick="deleteProduct(${i})">🗑️ Xóa</button></td>
         </tr>
-    `,
-    )
+      `;
+    })
     .join("");
 }
 
 // 5. Xóa sản phẩm
 function deleteProduct(i) {
-  if (confirm(`Bạn chắc chắn muốn xóa "${localDB.products[i].name}"?`)) {
+  if (
+    confirm(`Bạn chắc chắn muốn xóa "${localDB.products[i].name}" khỏi kho?`)
+  ) {
     localDB.products.splice(i, 1);
     database.ref("store_data_v3").set(localDB);
   }
 }
 
-// 6. Hiển thị doanh thu và lịch sử
+// 6. Hiển thị lịch sử
 function renderSalesHistory(historyObj) {
   let daySum = 0;
   let monthSum = 0;
@@ -164,26 +153,24 @@ function renderSalesHistory(historyObj) {
     .map((h) => {
       const amount = parseInt(h.total) || 0;
 
-      // Tính toán doanh thu ngày/tháng
-      if (h.time && h.time.includes(todayStr)) {
-        daySum += amount;
-      }
-      if (h.time && h.time.includes(monthYearStr)) {
-        monthSum += amount;
-      }
+      if (h.time && h.time.includes(todayStr)) daySum += amount;
+      if (h.time && h.time.includes(monthYearStr)) monthSum += amount;
+
+      // Icon phương thức thanh toán
+      const methodIcon = h.method === "Tiền mặt" ? "💵" : "💳";
 
       return `<tr>
-            <td><small>${h.time || "N/A"}</small></td>
-            <td><b>${h.billId || "HD"}</b></td>
-            <td>${amount.toLocaleString()}đ</td>
-            <td><small>${h.details || ""}</small></td>
+            <td style="color: #7f8c8d; font-size: 0.85rem;">${h.time || "N/A"}</td>
+            <td><b style="color:#1e3c72;">${h.billId || "HD"}</b> <br> <small>${methodIcon} ${h.method || ""}</small></td>
+            <td style="color: #e74c3c; font-weight: bold;">${amount.toLocaleString()}đ</td>
+            <td style="color: #34495e; font-size: 0.9rem;">${h.details || ""}</td>
         </tr>`;
     })
     .join("");
 
   document.getElementById("historyBody").innerHTML =
     html ||
-    `<tr><td colspan="4" style="text-align:center">Chưa có giao dịch</td></tr>`;
+    `<tr><td colspan="4" class="text-center">Chưa có giao dịch</td></tr>`;
   document.getElementById("totalDay").innerText = daySum.toLocaleString() + "đ";
   document.getElementById("totalMonth").innerText =
     monthSum.toLocaleString() + "đ";

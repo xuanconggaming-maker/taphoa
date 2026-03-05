@@ -1,147 +1,373 @@
+/* --- TỔNG THỂ & BIẾN MÀU SẮC --- */
 :root {
-  --p: #2c3e50;
-  --s: #27ae60;
-  --bg: #f4f7f6;
+  --primary-color: #1e3c72;
+  --secondary-color: #2a5298;
+  --accent-color: #27ae60;
+  --danger-color: #e74c3c;
+  --bg-color: #f4f7fa;
+  --card-bg: #ffffff;
+  --text-main: #2c3e50;
+  --text-muted: #7f8c8d;
+  --shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
 }
+
 body {
-  font-family: "Segoe UI", sans-serif;
-  background: var(--bg);
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: var(--bg-color);
+  color: var(--text-main);
   margin: 0;
-  padding: 20px;
+  padding: 0;
 }
+
 .container {
-  max-width: 1200px;
-  margin: auto;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 30px 20px;
 }
+
+/* --- MÀN HÌNH KHÓA (LOGIN) --- */
+.login-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    135deg,
+    rgba(30, 60, 114, 0.9) 0%,
+    rgba(42, 82, 152, 0.9) 100%
+  );
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.login-card {
+  background: white;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+  text-align: center;
+  width: 90%;
+  max-width: 350px;
+  animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+
+@keyframes popIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.login-icon {
+  font-size: 3rem;
+  margin-bottom: 10px;
+}
+
+.login-card h2 {
+  margin: 0;
+  color: var(--primary-color);
+  font-size: 1.5rem;
+}
+.login-card p {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  margin-bottom: 25px;
+}
+
+.login-card input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #eee;
+  border-radius: 10px;
+  font-size: 1rem;
+  text-align: center;
+  box-sizing: border-box;
+  margin-bottom: 15px;
+  transition: border 0.3s;
+}
+
+.login-card input:focus {
+  border-color: var(--secondary-color);
+  outline: none;
+}
+
+.btn-login {
+  width: 100%;
+  padding: 12px;
+  background: linear-gradient(135deg, #00b09b, #96c93d);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  font-size: 1rem;
+  cursor: pointer;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
+}
+
+.btn-login:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(39, 174, 96, 0.4);
+}
+
+.error-text {
+  display: none;
+  color: var(--danger-color) !important;
+  margin-top: 15px !important;
+  font-weight: bold;
+}
+
+/* --- HEADER QUẢN TRỊ --- */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 30px;
+  background: white;
+  padding: 20px 30px;
+  border-radius: 15px;
+  box-shadow: var(--shadow);
 }
+
+.header-title h2 {
+  margin: 0;
+  color: var(--primary-color);
+}
+.header-title p {
+  margin: 5px 0 0 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
 .btn-nav {
-  background: var(--p);
+  background: linear-gradient(
+    135deg,
+    var(--primary-color),
+    var(--secondary-color)
+  );
   color: white;
   text-decoration: none;
-  padding: 10px 15px;
-  border-radius: 8px;
+  padding: 12px 20px;
+  border-radius: 10px;
   font-weight: bold;
-  font-size: 14px;
+  font-size: 0.95rem;
+  transition:
+    transform 0.2s,
+    box-shadow 0.2s;
 }
+
+.btn-nav:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(30, 60, 114, 0.3);
+}
+
+/* --- BỐ CỤC CHÍNH --- */
 .grid-layout {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 20px;
+  gap: 25px;
 }
+
 .card {
-  background: white;
+  background: var(--card-bg);
+  padding: 25px;
+  border-radius: 20px;
+  box-shadow: var(--shadow);
+}
+
+.card-header h3 {
+  margin: 0 0 20px 0;
+  color: var(--primary-color);
+  border-bottom: 2px solid #f1f2f6;
+  padding-bottom: 10px;
+}
+
+/* --- FORM NHẬP HÀNG --- */
+.form-group {
+  background: #f8f9fa;
   padding: 20px;
   border-radius: 15px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 25px;
+  border: 1px solid #eee;
 }
+
 .form-group input {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 10px;
+  padding: 12px 15px;
+  margin-bottom: 12px;
   border: 1px solid #ddd;
-  border-radius: 6px;
+  border-radius: 8px;
   box-sizing: border-box;
+  font-size: 0.95rem;
+  outline: none;
 }
+.form-group input:focus {
+  border-color: var(--secondary-color);
+}
+
+.input-row {
+  display: flex;
+  gap: 12px;
+}
+
 .btn-add {
-  background: var(--s);
+  background: linear-gradient(135deg, #00b09b, #96c93d);
   color: white;
   width: 100%;
   border: none;
-  padding: 12px;
-  border-radius: 6px;
+  padding: 14px;
+  border-radius: 8px;
   cursor: pointer;
   font-weight: bold;
+  font-size: 1rem;
+  transition: all 0.2s;
 }
+.btn-add:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(39, 174, 96, 0.3);
+}
+
+/* --- THỐNG KÊ DOANH THU --- */
 .stats-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 15px;
-  margin-bottom: 20px;
+  margin-bottom: 25px;
 }
+
 .stat-item {
-  padding: 15px;
-  border-radius: 10px;
+  padding: 20px;
+  border-radius: 15px;
   color: white;
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
+
+.stat-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+  margin-bottom: 5px;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+.stat-value {
+  font-size: 1.8rem;
+  font-weight: 900;
+}
+
 .bg-blue {
-  background: #3498db;
+  background: linear-gradient(135deg, #4b7bec, #3867d6);
+  box-shadow: 0 5px 15px rgba(56, 103, 214, 0.3);
 }
 .bg-green {
-  background: #1abc9c;
+  background: linear-gradient(135deg, #2bcbba, #0fb9b1);
+  box-shadow: 0 5px 15px rgba(15, 185, 177, 0.3);
 }
+
+/* --- BẢNG DỮ LIỆU --- */
+.table-title {
+  margin: 0 0 10px 0;
+  color: var(--text-muted);
+  font-size: 1rem;
+}
+
 .scroll-table {
-  height: 400px;
+  height: 350px;
   overflow-y: auto;
+  border-radius: 10px;
   border: 1px solid #eee;
-  margin-top: 10px;
 }
+
+.scroll-table::-webkit-scrollbar {
+  width: 6px;
+}
+.scroll-table::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+}
+
 table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 13px;
+  font-size: 0.95rem;
 }
+
 th {
   position: sticky;
   top: 0;
-  background: #f8f9fa;
-  padding: 10px;
-  border-bottom: 2px solid #eee;
+  background: #f1f2f6;
+  padding: 12px 15px;
+  color: var(--primary-color);
+  font-weight: bold;
   text-align: left;
+  z-index: 1;
 }
+
 td {
-  padding: 10px;
-  border-bottom: 1px solid #eee;
+  padding: 12px 15px;
+  border-bottom: 1px solid #f1f2f6;
+  vertical-align: middle;
 }
-/* Hỗ trợ điện thoại (9:16) */
+
+tr:hover {
+  background-color: #f8f9fa;
+}
+
+.text-center {
+  text-align: center;
+  color: var(--text-muted);
+}
+
+.btn-delete {
+  background: #ffeaa7;
+  color: #d63031;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-delete:hover {
+  background: #ff7675;
+  color: white;
+}
+
+/* --- RESPONSIVE MOBILE --- */
 @media (max-width: 850px) {
   .grid-layout {
-    grid-template-columns: 1fr; /* Chỉ còn 1 cột duy nhất */
+    grid-template-columns: 1fr;
+    gap: 20px;
   }
-
   header {
     flex-direction: column;
-    gap: 10px;
+    gap: 15px;
     text-align: center;
+    padding: 20px;
   }
-
   .container {
-    padding: 10px;
-  }
-
-  .card {
     padding: 15px;
   }
-
-  /* Làm cho bảng dễ nhìn hơn trên mobile */
-  table {
-    font-size: 13px;
+  .card {
+    padding: 20px;
   }
-}
-/* --- Hỗ trợ điện thoại (9:16) và màn hình nhỏ --- */
-@media (max-width: 850px) {
-  .grid-layout {
-    grid-template-columns: 1fr; /* Chuyển 2 cột Admin thành 1 cột dọc */
-  }
-
-  header {
-    flex-direction: column;
-    gap: 10px;
-    text-align: center;
-  }
-
   .stats-grid {
-    grid-template-columns: 1fr; /* Các ô doanh thu xếp chồng lên nhau */
+    grid-template-columns: 1fr;
   }
-
   .scroll-table {
     height: auto;
-    max-height: 300px;
-    overflow-x: auto; /* Cho phép vuốt ngang bảng nếu bảng quá rộng */
+    max-height: 400px;
+    overflow-x: auto;
   }
 }
