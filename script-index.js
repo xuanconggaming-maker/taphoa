@@ -1,4 +1,4 @@
-// 1. Cấu hình Firebase (Phải khớp 100% với Admin)
+// 1. Cấu hình Firebase (Giữ nguyên 100%)
 const firebaseConfig = {
   apiKey: "AIzaSyA_1WA2ArsM0_atwF2BmtSBw_hl6g2GUJE",
   authDomain: "tap-hoa-ai-cu.firebaseapp.com",
@@ -13,31 +13,23 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
-// Biến lưu trữ dữ liệu
 let dbData = { products: [] };
 let cart = [];
 let lastBillNumber = 0;
 
-// ==========================================
-// 2. ĐOẠN CODE ĐỒNG BỘ ĐÂY (TRẠM THU DỮ LIỆU)
-// ==========================================
+// 2. Lắng nghe dữ liệu
 database.ref().on("value", (s) => {
   const data = s.val() || {};
-  // Lấy dữ liệu sản phẩm từ Admin (store_data_v3)
   dbData = data.store_data_v3 || { products: [] };
-  // Lấy số hóa đơn cuối cùng
   lastBillNumber = data.lastBillNumber || 0;
-
-  console.log("Dữ liệu đã đồng bộ từ Admin!");
-  renderProducts(); // Tự động vẽ lại danh sách khi Admin thay đổi
+  renderProducts();
 });
 
-// 3. Hiển thị sản phẩm ra màn hình
+// 3. Hiển thị sản phẩm (Tích hợp style thẻ mới)
 function renderProducts() {
   const searchVal = document.getElementById("search").value.toLowerCase();
   const grid = document.getElementById("productGrid");
 
-  // Lọc sản phẩm theo tìm kiếm và chỉ hiện sản phẩm còn hàng
   const html = (dbData.products || [])
     .map((p, idx) => {
       if (!p.name.toLowerCase().includes(searchVal)) return "";
@@ -47,7 +39,7 @@ function renderProducts() {
             <div class="p-info">
                 <b>${p.name}</b>
                 <span class="p-price">${p.price.toLocaleString()}đ</span>
-                <small>Còn lại: ${p.qty}</small>
+                <span class="badge-stock">Tồn kho: ${p.qty}</span>
             </div>
             <div class="p-action">
                 <input type="number" id="q-${idx}" value="1" min="1" max="${p.qty}">
@@ -57,10 +49,12 @@ function renderProducts() {
     })
     .join("");
 
-  grid.innerHTML = html || "<p>Không tìm thấy sản phẩm nào</p>";
+  grid.innerHTML =
+    html ||
+    "<p style='text-align:center; width:100%; color:#888'>Không tìm thấy sản phẩm nào</p>";
 }
 
-// 4. Thêm vào giỏ hàng
+// 4. Các hàm giỏ hàng (Giữ nguyên)
 function addToCart(idx) {
   const inputQty = parseInt(document.getElementById(`q-${idx}`).value);
   const product = dbData.products[idx];
@@ -83,7 +77,6 @@ function addToCart(idx) {
   renderCart();
 }
 
-// 5. Hiển thị giỏ hàng
 function renderCart() {
   let total = 0;
   const cartDiv = document.getElementById("cartItems");
@@ -94,8 +87,8 @@ function renderCart() {
       total += itemTotal;
       return `
         <div class="cart-item">
-            <span>${item.name} x ${item.q}</span>
-            <span>${itemTotal.toLocaleString()}đ <button onclick="removeFromCart(${i})">❌</button></span>
+            <span><b>${item.name}</b> x ${item.q}</span>
+            <span>${itemTotal.toLocaleString()}đ <button onclick="removeFromCart(${i})">✖</button></span>
         </div>`;
     })
     .join("");
@@ -109,29 +102,27 @@ function removeFromCart(i) {
   renderCart();
 }
 
-// 6. Thanh toán và ĐỒNG BỘ NGƯỢC LẠI ADMIN
-f; // 1. Hàm hiển thị QR (Sửa lỗi bấm nút "Quét mã QR")
+// 5. Hàm hiển thị QR (Giữ nguyên thông tin STK của bạn)
 function showQR() {
   const total = renderCart();
   if (total <= 0) return alert("Giỏ hàng đang trống!");
 
   const billID = "HD" + (lastBillNumber + 1);
-  const stk = "0386823702"; // Số tài khoản MB của bạn
+  const stk = "0386823702";
   const bank = "MB";
-  const name = "CU Y AI"; // Tên tài khoản của bạn (không dấu)
-  const memo = billID; // Nội dung chuyển khoản là mã hóa đơn
+  const name = "CU Y AI";
+  const memo = billID;
 
-  // Link API VietQR để tạo mã tự động
   const qrUrl = `https://img.vietqr.io/image/${bank}-${stk}-compact2.png?amount=${total}&addInfo=${memo}&accountName=${name}`;
 
-  // Khớp các ID với file HTML mới
   document.getElementById("qrImg").src = qrUrl;
   document.getElementById("qrInfo").innerHTML =
     `Mã HĐ: <b>${billID}</b> - Tổng: <b>${total.toLocaleString()}đ</b>`;
-  document.getElementById("qrMemo").innerText = memo; // Nội dung HĐ sẽ hiện ở đây
+  document.getElementById("qrMemo").innerText = memo;
   document.getElementById("qrModal").style.display = "flex";
 }
-// 2. Hàm xử lý thanh toán chung (Sửa lỗi bấm nút "Tiền mặt")
+
+// 6. Xử lý thanh toán chung (Giữ nguyên logic Firebase)
 function handlePay(method) {
   const sum = renderCart();
   if (cart.length === 0) return alert("Giỏ hàng trống!");
@@ -142,7 +133,6 @@ function handlePay(method) {
   const newID = lastBillNumber + 1;
   const billId = "HD" + newID;
 
-  // Trừ kho
   cart.forEach((c) => {
     dbData.products[c.idx].qty -= c.q;
   });
@@ -155,7 +145,6 @@ function handlePay(method) {
     details: cart.map((c) => `${c.name}(x${c.q})`).join(", "),
   };
 
-  // Đẩy dữ liệu lên Firebase
   const updates = {};
   updates["/store_data_v3/"] = dbData;
   updates["/sales_history/" + billId] = history;
@@ -175,7 +164,6 @@ function handlePay(method) {
     });
 }
 
-// 3. Đảm bảo có hàm đóng Modal
 function closeQR() {
   document.getElementById("qrModal").style.display = "none";
 }
