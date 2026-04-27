@@ -65,15 +65,21 @@ database.ref().on(
   },
 );
 
-// 3. Hàm Thêm
+// 3. Hàm Thêm Sản Phẩm (Đã thêm xử lý link ảnh)
 function addNewProduct() {
   const nameInput = document.getElementById("pName");
+  const imgInput = document.getElementById("pImg"); // Lấy ô link ảnh
   const priceInput = document.getElementById("pPrice");
   const qtyInput = document.getElementById("pQty");
 
   const name = nameInput.value.trim();
   const price = parseInt(priceInput.value);
   const qty = parseFloat(qtyInput.value) || 0;
+
+  // Lấy link ảnh, nếu trống thì dùng ảnh mặc định
+  const img =
+    imgInput.value.trim() ||
+    "https://images.unsplash.com/photo-1604719312566-8fa20658f1e1?auto=format&fit=crop&q=80&w=300&h=200";
 
   if (!name) return alert("Vui lòng nhập tên sản phẩm!");
   if (isNaN(price) || price <= 0)
@@ -83,7 +89,8 @@ function addNewProduct() {
   btn.disabled = true;
   btn.innerText = "⏳ ĐANG LƯU...";
 
-  localDB.products.push({ name, price, qty });
+  // Lưu thêm thuộc tính 'img' vào cơ sở dữ liệu
+  localDB.products.push({ name: name, price: price, qty: qty, img: img });
 
   database
     .ref("store_data_v3")
@@ -91,6 +98,7 @@ function addNewProduct() {
     .then(() => {
       alert("Đã thêm thành công: " + name);
       nameInput.value = "";
+      imgInput.value = ""; // Xóa trắng ô link ảnh
       priceInput.value = "";
       qtyInput.value = "";
     })
@@ -101,7 +109,7 @@ function addNewProduct() {
     });
 }
 
-// 4. Hiển thị bảng hàng
+// 4. Hiển thị bảng hàng (Có kèm ảnh thu nhỏ)
 function renderInventory() {
   const tbody = document.getElementById("inventoryBody");
   if (localDB.products.length === 0) {
@@ -111,7 +119,6 @@ function renderInventory() {
 
   tbody.innerHTML = localDB.products
     .map((p, i) => {
-      // Highlight màu đỏ nếu hết hàng
       const qtyStyle =
         p.qty <= 0
           ? "color: red; font-weight: bold;"
@@ -119,7 +126,10 @@ function renderInventory() {
 
       return `
         <tr>
-            <td><b>${p.name}</b></td>
+            <td style="display: flex; align-items: center; gap: 10px;">
+              <img src="${p.img || "https://via.placeholder.com/50"}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px;">
+              <b>${p.name}</b>
+            </td>
             <td style="color: #e74c3c; font-weight: 600;">${p.price.toLocaleString()}đ</td>
             <td style="${qtyStyle}">${p.qty}</td>
             <td><button class="btn-delete" onclick="deleteProduct(${i})">🗑️ Xóa</button></td>

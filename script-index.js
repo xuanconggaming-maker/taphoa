@@ -25,7 +25,7 @@ database.ref().on("value", (s) => {
   renderProducts();
 });
 
-// 3. Hiển thị sản phẩm (Tích hợp style thẻ mới)
+// 3. Hiển thị sản phẩm (Hiển thị ảnh đẹp mắt)
 function renderProducts() {
   const searchVal = document.getElementById("search").value.toLowerCase();
   const grid = document.getElementById("productGrid");
@@ -34,17 +34,30 @@ function renderProducts() {
     .map((p, idx) => {
       if (!p.name.toLowerCase().includes(searchVal)) return "";
 
+      // Nếu không có ảnh, lấy ảnh mặc định của giỏ rau quả
+      const imgUrl =
+        p.img ||
+        "https://images.unsplash.com/photo-1604719312566-8fa20658f1e1?auto=format&fit=crop&q=80&w=300&h=200";
+
       return `
-        <div class="product-card">
-            <div class="p-info">
-                <b>${p.name}</b>
-                <span class="p-price">${p.price.toLocaleString()}đ</span>
-                <span class="badge-stock">Tồn kho: ${p.qty}</span>
+        <div class="product-card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+            
+            <div style="width: 100%; height: 160px; background-color: #f0f0f0;">
+                <img src="${imgUrl}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: cover;">
             </div>
-            <div class="p-action">
-                <input type="number" id="q-${idx}" value="1" min="1" max="${p.qty}">
-                <button onclick="addToCart(${idx})">THÊM</button>
+            
+            <div style="padding: 15px; display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
+                <div class="p-info">
+                    <b>${p.name}</b>
+                    <span class="p-price">${p.price.toLocaleString()}đ</span>
+                    <span class="badge-stock">Tồn kho: ${p.qty}</span>
+                </div>
+                <div class="p-action">
+                    <input type="number" id="q-${idx}" value="1" min="1" max="${p.qty}">
+                    <button onclick="addToCart(${idx})">THÊM</button>
+                </div>
             </div>
+
         </div>`;
     })
     .join("");
