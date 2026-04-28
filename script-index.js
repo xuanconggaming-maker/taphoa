@@ -26,6 +26,7 @@ database.ref().on("value", (s) => {
 });
 
 // 3. Hiển thị sản phẩm (Hiển thị ảnh đẹp mắt)
+// 3. Hiển thị sản phẩm (Có tính toán trừ đi số lượng đã nhặt vào giỏ)
 function renderProducts() {
   const searchVal = document.getElementById("search").value.toLowerCase();
   const grid = document.getElementById("productGrid");
@@ -34,12 +35,17 @@ function renderProducts() {
     .map((p, idx) => {
       if (!p.name.toLowerCase().includes(searchVal)) return "";
 
-      // Nếu không có ảnh, lấy ảnh mặc định của giỏ rau quả
       const imgUrl =
         p.img ||
         "https://images.unsplash.com/photo-1604719312566-8fa20658f1e1?auto=format&fit=crop&q=80&w=300&h=200";
 
-      // Đã thêm thẻ <div class="col"> bọc bên ngoài và class h-100 để các thẻ cao bằng nhau
+      // Lấy số lượng đã thêm vào giỏ của sản phẩm này
+      const cartItem = cart.find((c) => c.idx === idx);
+      const qtyInCart = cartItem ? cartItem.q : 0;
+
+      // TỒN KHO THỰC TẾ = TỒN KHO GỐC - SỐ LƯỢNG TRONG GIỎ
+      const remainingQty = p.qty - qtyInCart;
+
       return `
         <div class="col">
           <div class="product-card h-100" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
@@ -52,14 +58,15 @@ function renderProducts() {
                   <div class="p-info">
                       <b>${p.name}</b>
                       <span class="p-price">${p.price.toLocaleString()}đ</span>
-                      <span class="badge-stock">Tồn kho: ${p.qty}</span>
+                      <span class="badge-stock">Tồn kho: ${remainingQty}</span>
                   </div>
                   <div class="p-action">
-                      <input type="number" id="q-${idx}" value="1" min="1" max="${p.qty}">
-                      <button onclick="addToCart(${idx})">THÊM</button>
+                      <input type="number" id="q-${idx}" value="1" min="1" max="${remainingQty}">
+                      <button onclick="addToCart(${idx})" ${remainingQty <= 0 ? 'disabled style="background:gray;"' : ""}>
+                        ${remainingQty <= 0 ? "HẾT HÀNG" : "THÊM"}
+                      </button>
                   </div>
               </div>
-
           </div>
         </div>`;
     })
@@ -70,52 +77,86 @@ function renderProducts() {
     "<div class='col-12'><p style='text-align:center; width:100%; color:#888'>Không tìm thấy sản phẩm nào</p></div>";
 }
 
-// 4. Các hàm giỏ hàng (Giữ nguyên)
+// 4. Thêm vào giỏ hàng (Đã lưu thêm link ảnh vào giỏ)
 function addToCart(idx) {
-  const inputQty = parseInt(document.getElementById(`q-${idx}`).value);
+  const inputEl = document.getElementById(`q-${idx}`);
+  const inputQty = parseInt(inputEl.value);
   const product = dbData.products[idx];
 
-  if (inputQty > product.qty) {
-    alert("Số lượng tồn kho không đủ!");
+  if (isNaN(inputQty) || inputQty <= 0) return;
+
+  const exist = cart.find((c) => c.idx === idx);
+  const currentCartQty = exist ? exist.q : 0;
+
+  // Kiểm tra xem tổng mua có vượt tồn kho thật không
+  if (currentCartQty + inputQty > product.qty) {
+    alert("Số lượng vượt quá tồn kho!");
     return;
   }
 
-  const exist = cart.find((c) => c.idx === idx);
   if (exist) {
-    if (exist.q + inputQty > product.qty) {
-      alert("Vượt quá số lượng trong kho!");
-      return;
-    }
     exist.q += inputQty;
   } else {
-    cart.push({ idx, name: product.name, price: product.price, q: inputQty });
+    // Lưu thêm thuộc tính img vào mảng giỏ hàng
+    cart.push({
+      idx,
+      name: product.name,
+      price: product.price,
+      q: inputQty,
+      img: product.img,
+    });
   }
+
+  inputEl.value = 1; // Reset ô nhập số lượng về 1 sau khi bấm thêm
   renderCart();
+  renderProducts(); // Gọi lại hàm này để load lại số lượng tồn kho trên màn hình
 }
 
+// 5. Hiển thị Giỏ Hàng (Đã có Ảnh sản phẩm)
 function renderCart() {
   let total = 0;
+  let totalItems = 0;
   const cartDiv = document.getElementById("cartItems");
 
   cartDiv.innerHTML = cart
     .map((item, i) => {
       const itemTotal = item.price * item.q;
       total += itemTotal;
+      totalItems += item.q;
+
+      const imgUrl =
+        item.img ||
+        "https://images.unsplash.com/photo-1604719312566-8fa20658f1e1?auto=format&fit=crop&q=80&w=300&h=200";
+
+      // Dùng Flexbox của Bootstrap để dàn ngang Ảnh - Tên - Nút xóa
       return `
-        <div class="cart-item">
-            <span><b>${item.name}</b> x ${item.q}</span>
-            <span>${itemTotal.toLocaleString()}đ <button onclick="removeFromCart(${i})">✖</button></span>
+        <div class="cart-item d-flex align-items-center mb-3 pb-3 border-bottom">
+            <img src="${imgUrl}" alt="${item.name}" style="width: 55px; height: 55px; object-fit: cover; border-radius: 10px; margin-right: 12px; border: 1px solid #eee;">
+            <div style="flex: 1; text-align: left;">
+                <b style="display: block; font-size: 0.95rem; color: #1e3c72; margin-bottom: 4px;">${item.name}</b>
+                <span class="text-danger fw-bold">${itemTotal.toLocaleString()}đ</span>
+            </div>
+            <div class="d-flex flex-column align-items-end">
+                <span class="badge bg-secondary mb-1" style="font-size: 0.9rem;">x ${item.q}</span>
+                <button class="btn btn-sm btn-outline-danger" style="padding: 2px 8px; font-size: 0.8rem;" onclick="removeFromCart(${i})">Xóa</button>
+            </div>
         </div>`;
     })
     .join("");
 
   document.getElementById("totalText").innerText = total.toLocaleString() + "đ";
+
+  const badge = document.getElementById("cartBadge");
+  if (badge) badge.innerText = totalItems;
+
   return total;
 }
 
+// 6. Xóa món khỏi giỏ hàng
 function removeFromCart(i) {
   cart.splice(i, 1);
   renderCart();
+  renderProducts(); // Khi xóa khỏi giỏ, tồn kho trên màn hình sẽ tự động cộng lại
 }
 
 // 5. Hàm hiển thị QR (Giữ nguyên thông tin STK của bạn)

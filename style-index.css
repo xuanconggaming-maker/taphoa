@@ -15,9 +15,7 @@ body {
   margin: 0;
   background-color: var(--bg-color);
   color: var(--text-color);
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
+  /* Đã xóa lệnh display: flex ở đây để cái nút không bị kéo giãn ngang màn hình nữa */
 }
 
 /* --- THANH ĐIỀU HƯỚNG --- */
@@ -29,8 +27,6 @@ nav {
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-
-  /* THÊM 3 DÒNG NÀY ĐỂ CỐ ĐỊNH MENU LÊN TOP */
   position: sticky;
   top: 0;
   z-index: 1030;
@@ -72,7 +68,7 @@ nav {
   overflow: hidden;
   margin-bottom: 25px;
   box-shadow: var(--shadow);
-  background: #ddd; /* Màu nền chờ load ảnh */
+  background: #ddd;
 }
 
 .banner-slider img {
@@ -86,7 +82,6 @@ nav {
   animation: fade 10s infinite;
 }
 
-/* Delay để 2 ảnh luân phiên nhau */
 .banner-slider img:nth-child(1) {
   animation-delay: 0s;
 }
@@ -247,8 +242,7 @@ nav {
   transform: translateY(-2px);
 }
 
-/* --- BÊN PHẢI: GIỎ HÀNG --- */
-
+/* --- BÊN PHẢI: GIỎ HÀNG (Dành cho Offcanvas) --- */
 .cart-box {
   background: var(--card-bg);
   padding: 25px;
@@ -256,7 +250,6 @@ nav {
   display: flex;
   flex-direction: column;
   box-shadow: var(--shadow);
-  /* height: 100%;  <-- Xóa dòng này đi */
   box-sizing: border-box;
 }
 
@@ -377,7 +370,7 @@ nav {
   background: rgba(15, 20, 31, 0.85);
   justify-content: center;
   align-items: center;
-  z-index: 1000;
+  z-index: 1050;
   backdrop-filter: blur(5px);
 }
 
@@ -414,7 +407,6 @@ nav {
   margin-bottom: 20px;
   color: #2f3542;
 }
-
 .qr-image-wrapper {
   background: #f4f7fa;
   padding: 15px;
@@ -422,7 +414,6 @@ nav {
   display: inline-block;
   margin-bottom: 20px;
 }
-
 #qrImg {
   width: 100%;
   max-width: 250px;
@@ -440,7 +431,6 @@ nav {
   flex-direction: column;
   gap: 5px;
 }
-
 .qr-memo-box b {
   font-size: 1.2rem;
   letter-spacing: 1px;
@@ -451,7 +441,6 @@ nav {
   gap: 15px;
   margin-top: 25px;
 }
-
 .modal-btns button {
   flex: 1;
   padding: 14px;
@@ -461,7 +450,6 @@ nav {
   cursor: pointer;
   transition: all 0.2s;
 }
-
 .btn-confirm-pay {
   background: var(--info-color);
   color: white;
@@ -470,7 +458,6 @@ nav {
   background: #0984e3;
   transform: scale(1.05);
 }
-
 .btn-close-modal {
   background: #dfe4ea;
   color: #2f3542;
@@ -479,33 +466,119 @@ nav {
   background: #ff4757;
   color: white;
 }
+/* =========================================
+   THU NHỎ CỠ CHỮ TOÀN BỘ GIAO DIỆN (GIỐNG APP)
+========================================= */
+/* 1. Thu nhỏ Ô tìm kiếm */
+#search {
+  font-size: 0.9rem !important;
+  padding: 10px 20px !important;
+}
 
-/* --- RESPONSIVE MOBILE TỐI ƯU GỌN GÀNG --- */
-@media (max-width: 850px) {
-  /* 1. Ép toàn bộ khung phải dính chặt xuống đáy màn hình */
-  .right-side {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    z-index: 1020;
-  }
+/* 2. Thu nhỏ thẻ Sản phẩm */
+.p-info b {
+  font-size: 0.85rem !important; /* Tên sản phẩm nhỏ lại */
+  height: 2.4rem !important;
+  margin-bottom: 5px !important;
+}
+.p-price {
+  font-size: 1rem !important; /* Giá tiền nhỏ lại */
+  margin-bottom: 5px !important;
+}
+.badge-stock {
+  font-size: 0.7rem !important;
+  padding: 3px 8px !important;
+  margin-bottom: 10px !important;
+}
+.product-card input {
+  font-size: 0.85rem !important;
+  padding: 5px !important;
+  width: 45px !important;
+}
+.product-card button {
+  font-size: 0.8rem !important;
+  padding: 6px 10px !important;
+}
 
-  /* 2. Tạo hình dáng bo tròn góc trên và đổ bóng lên trên cho giỏ hàng */
-  .cart-box {
-    border-radius: 20px 20px 0 0;
-    box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.15);
-    margin: 0;
-    padding: 15px 20px 10px 20px;
-  }
+/* 3. Thu nhỏ khu vực Giỏ hàng */
+.offcanvas-title {
+  font-size: 1.1rem !important;
+}
+.cart-item {
+  font-size: 0.85rem !important;
+  padding: 10px 0 !important;
+}
+.cart-item b {
+  font-size: 0.85rem !important;
+}
+.cart-item img {
+  width: 40px !important; /* Ảnh trong giỏ nhỏ lại */
+  height: 40px !important;
+}
+.cart-item .badge {
+  font-size: 0.75rem !important;
+}
+.cart-item button {
+  font-size: 0.7rem !important;
+  padding: 3px 6px !important;
+}
 
-  /* 3. Giới hạn chiều cao danh sách món để giỏ hàng không chiếm hết màn hình */
-  .cart-list {
-    max-height: 20vh !important;
-  }
+/* Thu nhỏ khu thanh toán */
+.total-box {
+  padding: 10px 15px !important;
+  margin-bottom: 15px !important;
+}
+.total-box span:first-child {
+  font-size: 0.85rem !important;
+}
+#totalText {
+  font-size: 1.1rem !important; /* Tổng tiền không bị quá khổng lồ */
+}
+.payment-actions p {
+  font-size: 0.8rem !important;
+  margin-bottom: 8px !important;
+}
+.payment-actions button {
+  font-size: 0.85rem !important;
+  padding: 10px !important;
+  margin-bottom: 8px !important;
+}
+/* =========================================
+   NÚT GIỎ HÀNG MINI TRÔI NỔI CHUẨN (MỚI)
+========================================= */
+.cart-floating-btn {
+  position: fixed !important;
+  bottom: 30px !important;
+  right: 30px !important;
+  background: var(--card-bg);
+  color: #1e3c72;
+  border: 2px solid #1e3c72;
+  border-radius: 50%;
+  width: 70px;
+  height: 70px;
+  font-size: 1.8rem;
+  box-shadow: 0 10px 25px rgba(30, 60, 114, 0.4);
+  cursor: pointer;
+  z-index: 9999 !important;
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  transition: all 0.3s ease;
+}
 
-  /* 4. Đẩy danh sách sản phẩm lên cao để có thể cuộn và xem hết hàng hóa bị giỏ hàng che */
-  .left-side {
-    padding-bottom: 380px;
-  }
+.cart-floating-btn:hover {
+  transform: scale(1.1) rotate(5deg);
+  background: #1e3c72;
+  color: white;
+}
+
+/* Ẩn thẻ cart-box cũ nếu còn sót lại trên giao diện */
+.right-side {
+  display: none !important;
+}
+
+/* Chỉnh lại bóng cho khung trượt Offcanvas của Bootstrap */
+.offcanvas {
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.1);
+  border: none;
 }
