@@ -136,6 +136,9 @@ header {
   padding: 20px 30px;
   border-radius: 15px;
   box-shadow: var(--shadow);
+  position: sticky;
+  top: 0;
+  z-index: 1030;
 }
 
 .header-title h2 {
@@ -183,6 +186,13 @@ header {
   border-radius: 20px;
   box-shadow: var(--shadow);
 }
+.card-header {
+  position: sticky;
+  top: 90px; /* Nằm ngay dưới thanh header */
+  z-index: 1020;
+  background: var(--card-bg); /* Tạo nền trắng để che nội dung cuộn bên dưới */
+  padding-top: 10px;
+}
 
 .card-header h3 {
   margin: 0 0 20px 0;
@@ -198,6 +208,9 @@ header {
   border-radius: 15px;
   margin-bottom: 25px;
   border: 1px solid #eee;
+  position: sticky;
+  top: 145px; /* Nằm ngay dưới chữ Nhập hàng mới */
+  z-index: 1020;
 }
 
 .form-group input {
@@ -370,4 +383,19 @@ tr:hover {
     max-height: 400px;
     overflow-x: auto;
   }
+}
+.btn-edit {
+  background: #dff9fb;
+  color: #22a6b3;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-edit:hover {
+  background: #22a6b3;
+  color: white;
 }

@@ -48,6 +48,7 @@ firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
 
 let localDB = { products: [] };
+let editIndex = -1; // -1 nghĩa là đang thêm mới, >= 0 nghĩa là đang sửa
 
 // 2. Lắng nghe dữ liệu (Realtime)
 database.ref().on(
@@ -66,17 +67,16 @@ database.ref().on(
 );
 
 // 3. Hàm Thêm Sản Phẩm (Đã thêm xử lý link ảnh)
+// 3. Hàm Thêm / Cập Nhật Sản Phẩm
 function addNewProduct() {
   const nameInput = document.getElementById("pName");
-  const imgInput = document.getElementById("pImg"); // Lấy ô link ảnh
+  const imgInput = document.getElementById("pImg");
   const priceInput = document.getElementById("pPrice");
   const qtyInput = document.getElementById("pQty");
 
   const name = nameInput.value.trim();
   const price = parseInt(priceInput.value);
   const qty = parseFloat(qtyInput.value) || 0;
-
-  // Lấy link ảnh, nếu trống thì dùng ảnh mặc định
   const img =
     imgInput.value.trim() ||
     "https://images.unsplash.com/photo-1604719312566-8fa20658f1e1?auto=format&fit=crop&q=80&w=300&h=200";
@@ -89,31 +89,72 @@ function addNewProduct() {
   btn.disabled = true;
   btn.innerText = "⏳ ĐANG LƯU...";
 
-  // Lưu thêm thuộc tính 'img' vào cơ sở dữ liệu
-  localDB.products.push({ name: name, price: price, qty: qty, img: img });
+  if (editIndex > -1) {
+    // CHẾ ĐỘ SỬA: Chỉ cập nhật giá, số lượng, hình ảnh (Giữ nguyên tên)
+    localDB.products[editIndex].price = price;
+    localDB.products[editIndex].qty = qty;
+    localDB.products[editIndex].img = img;
+  } else {
+    // CHẾ ĐỘ THÊM MỚI
+    localDB.products.push({ name: name, price: price, qty: qty, img: img });
+  }
 
   database
     .ref("store_data_v3")
     .set(localDB)
     .then(() => {
-      alert("Đã thêm thành công: " + name);
+      alert(
+        editIndex > -1
+          ? "Đã cập nhật sản phẩm thành công!"
+          : "Đã thêm thành công: " + name,
+      );
+
+      // Reset lại form sau khi lưu
       nameInput.value = "";
-      imgInput.value = ""; // Xóa trắng ô link ảnh
+      nameInput.disabled = false; // Mở khóa lại ô nhập tên
+      imgInput.value = "";
       priceInput.value = "";
       qtyInput.value = "";
+
+      // Trả nút bấm về trạng thái ban đầu
+      editIndex = -1;
+      btn.innerHTML = "➕ XÁC NHẬN THÊM";
+      btn.style.background = ""; // Khôi phục màu gốc
     })
     .catch((err) => alert("Lỗi: " + err.message))
     .finally(() => {
       btn.disabled = false;
-      btn.innerText = "➕ XÁC NHẬN THÊM";
     });
 }
 
-// 4. Hiển thị bảng hàng (Có kèm ảnh thu nhỏ)
+// 3.5. Hàm kích hoạt chế độ Sửa (Mới)
+function editProduct(i) {
+  const p = localDB.products[i];
+
+  // Đưa dữ liệu lên form
+  document.getElementById("pName").value = p.name;
+  document.getElementById("pName").disabled = true; // KHÓA KHÔNG CHO SỬA TÊN
+
+  document.getElementById("pImg").value = p.img || "";
+  document.getElementById("pPrice").value = p.price;
+  document.getElementById("pQty").value = p.qty;
+
+  editIndex = i; // Đánh dấu đang sửa sản phẩm vị trí thứ i
+
+  // Đổi giao diện nút bấm thành Cập nhật
+  const btn = document.getElementById("btnAddProduct");
+  btn.innerHTML = "💾 CẬP NHẬT SẢN PHẨM";
+  btn.style.background = "linear-gradient(135deg, #f39c12, #e67e22)"; // Đổi nút sang màu cam báo hiệu đang sửa
+
+  // Tự động cuộn trang lên trên cùng để người dùng thấy form
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+// 4. Hiển thị bảng hàng (Đã fix lỗi STT và thêm nút Sửa)
 function renderInventory() {
   const tbody = document.getElementById("inventoryBody");
   if (localDB.products.length === 0) {
-    tbody.innerHTML = `<tr><td colspan="4" class="text-center">Chưa có hàng trong kho</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="5" class="text-center">Chưa có hàng trong kho</td></tr>`;
     return;
   }
 
@@ -126,13 +167,22 @@ function renderInventory() {
 
       return `
         <tr>
+            <td style="font-weight: bold; color: #1e3c72; text-align: center;">${i + 1}</td>
+            
             <td style="display: flex; align-items: center; gap: 10px;">
               <img src="${p.img || "https://via.placeholder.com/50"}" style="width: 40px; height: 40px; object-fit: cover; border-radius: 6px;">
               <b>${p.name}</b>
             </td>
+            
             <td style="color: #e74c3c; font-weight: 600;">${p.price.toLocaleString()}đ</td>
             <td style="${qtyStyle}">${p.qty}</td>
-            <td><button class="btn-delete" onclick="deleteProduct(${i})">🗑️ Xóa</button></td>
+            
+            <td>
+              <div style="display: flex; gap: 5px;">
+                <button class="btn-edit" onclick="editProduct(${i})">✏️ Sửa</button>
+                <button class="btn-delete" onclick="deleteProduct(${i})">🗑️ Xóa</button>
+              </div>
+            </td>
         </tr>
       `;
     })
