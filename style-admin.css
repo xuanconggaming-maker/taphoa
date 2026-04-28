@@ -398,4 +398,34 @@ tr:hover {
 .btn-edit:hover {
   background: #22a6b3;
   color: white;
+
+  /* Thêm đoạn này vào dưới cùng trong @media (max-width: 850px) */
+
+  /* 1. Thu nhỏ chữ và lề của bảng */
+  table {
+    font-size: 0.8rem;
+  }
+  th,
+  td {
+    padding: 10px 4px;
+  }
+
+  /* 2. Thu nhỏ ảnh sản phẩm một chút */
+  td img {
+    width: 35px !important;
+    height: 35px !important;
+  }
+
+  /* 3. Bẻ dọc 2 nút Sửa / Xóa để tiết kiệm bề ngang */
+  td div {
+    flex-direction: column !important;
+    gap: 6px !important;
+  }
+  .btn-edit,
+  .btn-delete {
+    width: 100%; /* Cho 2 nút dài bằng nhau */
+    padding: 6px 4px;
+    font-size: 0.75rem;
+    text-align: center;
+  }
 }
