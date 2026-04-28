@@ -65,7 +65,7 @@ function renderProducts() {
   grid.innerHTML =
     html ||
     "<p style='text-align:center; width:100%; color:#888'>Không tìm thấy sản phẩm nào</p>";
-}
+}`
 
 // 4. Các hàm giỏ hàng (Giữ nguyên)
 function addToCart(idx) {

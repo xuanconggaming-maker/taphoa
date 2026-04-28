@@ -4,6 +4,10 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Tạp Hóa Ái Cử</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="style-index.css" />
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-database-compat.js"></script>
@@ -17,54 +21,79 @@
       <a href="admin.html" class="btn-admin">⚙️ Quản Lý</a>
     </nav>
 
-    <div class="main-content">
-      <section class="left-side">
-        <div class="banner-slider">
-          <img
-            class="slide"
-            src="https://images.unsplash.com/photo-1604719312566-8fa20658f1e1?auto=format&fit=crop&q=80&w=1000&h=300"
-            alt="Khuyến mãi 1"
-          />
-          <img
-            class="slide"
-            src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1000&h=300"
-            alt="Khuyến mãi 2"
-          />
-          <div class="banner-overlay">Khuyến Mãi Hôm Nay 🔥</div>
-        </div>
-
-        <div class="search-container">
-          <input
-            type="text"
-            id="search"
-            placeholder="🔍 Tìm kiếm sản phẩm (vd: bánh, kẹo)..."
-            oninput="renderProducts()"
-          />
-        </div>
-
-        <div id="productGrid" class="grid"></div>
-      </section>
-
-      <section class="right-side">
-        <div class="cart-box">
-          <h3>🛒 Giỏ hàng của bạn</h3>
-          <div id="cartItems" class="cart-list"></div>
-          <div class="total-box">
-            <span>Tổng thanh toán:</span>
-            <span id="totalText" class="total-price">0đ</span>
+    <div class="container-fluid py-4 main-content">
+      <div class="row g-4">
+        <section class="col-lg-8 col-12 left-side">
+          <div class="banner-slider mb-4">
+            <img
+              class="slide"
+              src="https://images.unsplash.com/photo-1604719312566-8fa20658f1e1?auto=format&fit=crop&q=80&w=1000&h=300"
+              alt="Khuyến mãi 1"
+            />
+            <img
+              class="slide"
+              src="https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=1000&h=300"
+              alt="Khuyến mãi 2"
+            />
+            <div class="banner-overlay">Khuyến Mãi Hôm Nay 🔥</div>
           </div>
 
-          <div class="payment-actions">
-            <p>Chọn phương thức thanh toán</p>
-            <button class="btn-pay cash" onclick="handlePay('Tiền mặt')">
-              💵 TIỀN MẶT
-            </button>
-            <button class="btn-pay qr" onclick="showQR()">
-              🖼️ QUYÉT MÃ QR
-            </button>
+          <div class="search-container mb-4">
+            <input
+              type="text"
+              id="search"
+              class="form-control form-control-lg rounded-pill shadow-sm"
+              placeholder="🔍 Tìm kiếm sản phẩm (vd: bánh, kẹo)..."
+              oninput="renderProducts()"
+            />
           </div>
-        </div>
-      </section>
+
+          <div
+            id="productGrid"
+            class="row row-cols-2 row-cols-md-3 row-cols-xl-4 g-3"
+          ></div>
+        </section>
+
+        <section class="col-lg-4 col-12 right-side">
+          <div class="cart-box sticky-top" style="top: 20px">
+            <h3 class="border-bottom pb-3 mb-3 text-primary">
+              🛒 Giỏ hàng của bạn
+            </h3>
+            <div
+              id="cartItems"
+              class="cart-list mb-3 overflow-auto"
+              style="max-height: 40vh"
+            ></div>
+
+            <div
+              class="total-box d-flex justify-content-between align-items-center bg-light p-3 rounded-3 mb-3"
+            >
+              <span class="fw-bold text-secondary">Tổng thanh toán:</span>
+              <span id="totalText" class="total-price text-danger fs-3 fw-bold"
+                >0đ</span
+              >
+            </div>
+
+            <div class="payment-actions">
+              <p class="text-center fw-bold text-secondary mb-3">
+                Chọn phương thức thanh toán
+              </p>
+              <button
+                class="btn btn-success w-100 mb-2 py-3 fw-bold"
+                onclick="handlePay('Tiền mặt')"
+              >
+                💵 TIỀN MẶT
+              </button>
+              <button
+                class="btn btn-primary w-100 py-3 fw-bold"
+                onclick="showQR()"
+              >
+                🖼️ QUYÉT MÃ QR
+              </button>
+            </div>
+          </div>
+        </section>
+      </div>
     </div>
 
     <div id="qrModal" class="modal">
