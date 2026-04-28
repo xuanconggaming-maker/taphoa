@@ -29,6 +29,11 @@ nav {
   justify-content: space-between;
   align-items: center;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+
+  /* THÊM 3 DÒNG NÀY ĐỂ CỐ ĐỊNH MENU LÊN TOP */
+  position: sticky;
+  top: 0;
+  z-index: 1030;
 }
 
 .logo {
@@ -477,46 +482,30 @@ nav {
 
 /* --- RESPONSIVE MOBILE TỐI ƯU GỌN GÀNG --- */
 @media (max-width: 850px) {
-  .main-content {
-    flex-direction: column;
-    padding: 15px;
-    gap: 15px;
-    height: auto;
-    overflow-y: auto;
-  }
-  .left-side,
+  /* 1. Ép toàn bộ khung phải dính chặt xuống đáy màn hình */
   .right-side {
+    position: fixed;
+    bottom: 0;
+    left: 0;
     width: 100%;
+    z-index: 1020;
   }
 
-  .banner-slider {
-    height: 160px;
-  } /* Banner nhỏ lại trên đt */
-
-  .grid {
-    grid-template-columns: repeat(2, 1fr);
-    padding-right: 0;
-  }
-
-  nav {
-    padding: 10px 15px;
-  }
-  .logo {
-    font-size: 1.3rem;
-  }
-  .btn-admin {
-    padding: 6px 15px;
-    font-size: 0.85rem;
-  }
-
+  /* 2. Tạo hình dáng bo tròn góc trên và đổ bóng lên trên cho giỏ hàng */
   .cart-box {
-    padding: 15px;
+    border-radius: 20px 20px 0 0;
+    box-shadow: 0 -10px 25px rgba(0, 0, 0, 0.15);
+    margin: 0;
+    padding: 15px 20px 10px 20px;
   }
-  .p-info b {
-    font-size: 1rem;
-    height: 2.8rem;
+
+  /* 3. Giới hạn chiều cao danh sách món để giỏ hàng không chiếm hết màn hình */
+  .cart-list {
+    max-height: 20vh !important;
   }
-  .p-price {
-    font-size: 1.2rem;
+
+  /* 4. Đẩy danh sách sản phẩm lên cao để có thể cuộn và xem hết hàng hóa bị giỏ hàng che */
+  .left-side {
+    padding-bottom: 380px;
   }
 }

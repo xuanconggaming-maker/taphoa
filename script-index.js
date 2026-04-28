@@ -39,32 +39,35 @@ function renderProducts() {
         p.img ||
         "https://images.unsplash.com/photo-1604719312566-8fa20658f1e1?auto=format&fit=crop&q=80&w=300&h=200";
 
+      // Đã thêm thẻ <div class="col"> bọc bên ngoài và class h-100 để các thẻ cao bằng nhau
       return `
-        <div class="product-card" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
-            
-            <div style="width: 100%; height: 160px; background-color: #f0f0f0;">
-                <img src="${imgUrl}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: cover;">
-            </div>
-            
-            <div style="padding: 15px; display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
-                <div class="p-info">
-                    <b>${p.name}</b>
-                    <span class="p-price">${p.price.toLocaleString()}đ</span>
-                    <span class="badge-stock">Tồn kho: ${p.qty}</span>
-                </div>
-                <div class="p-action">
-                    <input type="number" id="q-${idx}" value="1" min="1" max="${p.qty}">
-                    <button onclick="addToCart(${idx})">THÊM</button>
-                </div>
-            </div>
+        <div class="col">
+          <div class="product-card h-100" style="padding: 0; overflow: hidden; display: flex; flex-direction: column;">
+              
+              <div style="width: 100%; height: 160px; background-color: #f0f0f0;">
+                  <img src="${imgUrl}" alt="${p.name}" style="width: 100%; height: 100%; object-fit: cover;">
+              </div>
+              
+              <div style="padding: 15px; display: flex; flex-direction: column; flex: 1; justify-content: space-between;">
+                  <div class="p-info">
+                      <b>${p.name}</b>
+                      <span class="p-price">${p.price.toLocaleString()}đ</span>
+                      <span class="badge-stock">Tồn kho: ${p.qty}</span>
+                  </div>
+                  <div class="p-action">
+                      <input type="number" id="q-${idx}" value="1" min="1" max="${p.qty}">
+                      <button onclick="addToCart(${idx})">THÊM</button>
+                  </div>
+              </div>
 
+          </div>
         </div>`;
     })
     .join("");
 
   grid.innerHTML =
     html ||
-    "<p style='text-align:center; width:100%; color:#888'>Không tìm thấy sản phẩm nào</p>";
+    "<div class='col-12'><p style='text-align:center; width:100%; color:#888'>Không tìm thấy sản phẩm nào</p></div>";
 }
 
 // 4. Các hàm giỏ hàng (Giữ nguyên)
