@@ -90,7 +90,8 @@ function addNewProduct() {
   btn.innerText = "⏳ ĐANG LƯU...";
 
   if (editIndex > -1) {
-    // CHẾ ĐỘ SỬA: Chỉ cập nhật giá, số lượng, hình ảnh (Giữ nguyên tên)
+    // CHẾ ĐỘ SỬA: Cập nhật CẢ TÊN, giá, số lượng, hình ảnh
+    localDB.products[editIndex].name = name; // <-- BẠN THÊM DÒNG NÀY VÀO ĐÂY
     localDB.products[editIndex].price = price;
     localDB.products[editIndex].qty = qty;
     localDB.products[editIndex].img = img;
@@ -133,7 +134,7 @@ function editProduct(i) {
 
   // Đưa dữ liệu lên form
   document.getElementById("pName").value = p.name;
-  document.getElementById("pName").disabled = true; // KHÓA KHÔNG CHO SỬA TÊN
+  document.getElementById("pName").disabled = false; // MỞ KHÓA CHO SỬA TÊN
 
   document.getElementById("pImg").value = p.img || "";
   document.getElementById("pPrice").value = p.price;
