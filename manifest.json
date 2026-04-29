@@ -1,0 +1,21 @@
+{
+  "name": "Tạp Hóa Ái Cử",
+  "short_name": "Tạp Hóa",
+  "description": "Cửa hàng bách hóa tiện lợi",
+  "start_url": "/taphoa/index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e3c72",
+  "icons": [
+    {
+      "src": "icon-192.png.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
