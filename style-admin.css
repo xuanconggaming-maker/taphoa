@@ -226,6 +226,24 @@ header {
 .form-group input:focus {
   border-color: var(--secondary-color);
 }
+/* Sửa lỗi checkbox bị kéo dài */
+.form-group input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  margin-bottom: 0;
+  cursor: pointer;
+}
+
+.form-check {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Khoảng cách giữa ô vuông và chữ */
+}
+
+.form-check label {
+  cursor: pointer;
+  margin-bottom: 0;
+}
 
 .input-row {
   display: flex;
@@ -427,5 +445,52 @@ tr:hover {
     padding: 6px 4px;
     font-size: 0.75rem;
     text-align: center;
+  }
+}
+/* --- HIỆU ỨNG CHUÔNG BÁO ĐƠN MỚI --- */
+@keyframes flashAlert {
+  0% {
+    box-shadow: 0 0 0 0 rgba(225, 95, 65, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 20px rgba(225, 95, 65, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(225, 95, 65, 0);
+  }
+}
+
+.alert-mode {
+  animation: flashAlert 1.5s infinite;
+  border: 3px solid #e15f41 !important;
+}
+
+.btn-stop-sound {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 1rem;
+  animation: shake 0.5s infinite;
+}
+
+@keyframes shake {
+  0% {
+    transform: translateX(0);
+  }
+  25% {
+    transform: translateX(-5px);
+  }
+  50% {
+    transform: translateX(5px);
+  }
+  75% {
+    transform: translateX(-5px);
+  }
+  100% {
+    transform: translateX(0);
   }
 }

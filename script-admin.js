@@ -49,6 +49,7 @@ const database = firebase.database();
 
 let localDB = { products: [] };
 let editIndex = -1; // -1 nghĩa là đang thêm mới, >= 0 nghĩa là đang sửa
+let previousOrderCount = -1; // Dùng để theo dõi số lượng đơn hàng
 
 // 2. Lắng nghe dữ liệu (Realtime)
 database.ref().on(
@@ -58,14 +59,24 @@ database.ref().on(
     localDB = data.store_data_v3 || { products: [] };
     if (!Array.isArray(localDB.products)) localDB.products = [];
 
+    // --- LOGIC PHÁT HIỆN ĐƠN MỚI VÀ RUNG CHUÔNG ---
+    const historyObj = data.sales_history || {};
+    const currentOrderCount = Object.keys(historyObj).length;
+
+    // Nếu không phải lần load đầu tiên VÀ số đơn tăng lên
+    if (previousOrderCount !== -1 && currentOrderCount > previousOrderCount) {
+      triggerAlarm(); // Réo chuông!
+    }
+    previousOrderCount = currentOrderCount;
+    // ---------------------------------------------
+
     renderInventory();
-    renderSalesHistory(data.sales_history || {});
+    renderSalesHistory(historyObj);
   },
   (error) => {
     alert("Không thể kết nối cơ sở dữ liệu!");
   },
 );
-
 // 3. Hàm Thêm Sản Phẩm (Đã thêm xử lý link ảnh)
 // 3. Hàm Thêm / Cập Nhật Sản Phẩm
 function addNewProduct() {
@@ -80,6 +91,7 @@ function addNewProduct() {
   const img =
     imgInput.value.trim() ||
     "https://images.unsplash.com/photo-1604719312566-8fa20658f1e1?auto=format&fit=crop&q=80&w=300&h=200";
+  const allowDelivery = document.getElementById("pDelivery").checked;
 
   if (!name) return alert("Vui lòng nhập tên sản phẩm!");
   if (isNaN(price) || price <= 0)
@@ -90,14 +102,21 @@ function addNewProduct() {
   btn.innerText = "⏳ ĐANG LƯU...";
 
   if (editIndex > -1) {
-    // CHẾ ĐỘ SỬA: Cập nhật CẢ TÊN, giá, số lượng, hình ảnh
-    localDB.products[editIndex].name = name; // <-- BẠN THÊM DÒNG NÀY VÀO ĐÂY
+    localDB.products[editIndex].name = name;
     localDB.products[editIndex].price = price;
     localDB.products[editIndex].qty = qty;
     localDB.products[editIndex].img = img;
+    // Dòng mới thêm:
+    localDB.products[editIndex].allowDelivery = allowDelivery;
   } else {
-    // CHẾ ĐỘ THÊM MỚI
-    localDB.products.push({ name: name, price: price, qty: qty, img: img });
+    // Sửa dòng push này để thêm allowDelivery:
+    localDB.products.push({
+      name: name,
+      price: price,
+      qty: qty,
+      img: img,
+      allowDelivery: allowDelivery,
+    });
   }
 
   database
@@ -116,6 +135,7 @@ function addNewProduct() {
       imgInput.value = "";
       priceInput.value = "";
       qtyInput.value = "";
+      document.getElementById("pDelivery").checked = false; // <-- BẠN THÊM DÒNG NÀY VÀO ĐÂY NHÉ
 
       // Trả nút bấm về trạng thái ban đầu
       editIndex = -1;
@@ -139,7 +159,7 @@ function editProduct(i) {
   document.getElementById("pImg").value = p.img || "";
   document.getElementById("pPrice").value = p.price;
   document.getElementById("pQty").value = p.qty;
-
+  document.getElementById("pDelivery").checked = p.allowDelivery || false;
   editIndex = i; // Đánh dấu đang sửa sản phẩm vị trí thứ i
 
   // Đổi giao diện nút bấm thành Cập nhật
@@ -210,29 +230,84 @@ function renderSalesHistory(historyObj) {
 
   const historyList = Object.values(historyObj).reverse();
 
-  const html = historyList
-    .map((h) => {
-      const amount = parseInt(h.total) || 0;
+  let normalHtml = "";
+  let deliveryHtml = "";
 
-      if (h.time && h.time.includes(todayStr)) daySum += amount;
-      if (h.time && h.time.includes(monthYearStr)) monthSum += amount;
+  historyList.forEach((h) => {
+    const amount = parseInt(h.total) || 0;
 
-      // Icon phương thức thanh toán
+    if (h.time && h.time.includes(todayStr)) daySum += amount;
+    if (h.time && h.time.includes(monthYearStr)) monthSum += amount;
+
+    // PHÂN LOẠI ĐƠN HÀNG
+    if (h.method === "Giao Hàng") {
+      deliveryHtml += `
+        <tr style="background: #fffdf0; border-bottom: 2px solid #eee;">
+            <td style="color: #7f8c8d; font-size: 0.85rem;">${h.time}</td>
+            <td><b style="color:#d35400;">${h.billId}</b></td>
+            <td style="color: #34495e; font-size: 0.95rem; line-height: 1.5;">
+              ${h.details} <br> 
+              <b style="color: #e74c3c; font-size: 1.1rem;">Tổng thu: ${amount.toLocaleString()}đ</b>
+            </td>
+            <td>
+              <button onclick="alert('Đã ghi nhận đang chuẩn bị đơn ${h.billId}')" class="btn-edit" style="background:#27ae60; color:white; width: 100%;">Chuẩn bị hàng</button>
+            </td>
+        </tr>`;
+    } else {
       const methodIcon = h.method === "Tiền mặt" ? "💵" : "💳";
-
-      return `<tr>
+      normalHtml += `
+        <tr>
             <td style="color: #7f8c8d; font-size: 0.85rem;">${h.time || "N/A"}</td>
             <td><b style="color:#1e3c72;">${h.billId || "HD"}</b> <br> <small>${methodIcon} ${h.method || ""}</small></td>
             <td style="color: #e74c3c; font-weight: bold;">${amount.toLocaleString()}đ</td>
             <td style="color: #34495e; font-size: 0.9rem;">${h.details || ""}</td>
         </tr>`;
-    })
-    .join("");
+    }
+  });
 
+  // Đổ dữ liệu vào 2 bảng khác nhau
   document.getElementById("historyBody").innerHTML =
-    html ||
-    `<tr><td colspan="4" class="text-center">Chưa có giao dịch</td></tr>`;
+    normalHtml ||
+    `<tr><td colspan="4" class="text-center">Chưa có giao dịch tại quầy</td></tr>`;
+
+  const deliveryBody = document.getElementById("deliveryBody");
+  if (deliveryBody) {
+    deliveryBody.innerHTML =
+      deliveryHtml ||
+      `<tr><td colspan="4" class="text-center">Chưa có đơn hàng giao tận nơi</td></tr>`;
+  }
+
   document.getElementById("totalDay").innerText = daySum.toLocaleString() + "đ";
   document.getElementById("totalMonth").innerText =
     monthSum.toLocaleString() + "đ";
+}
+// --- CÁC HÀM XỬ LÝ CHUÔNG BÁO ---
+function triggerAlarm() {
+  const audio = document.getElementById("alarmSound");
+  const card = document.getElementById("deliveryCard");
+  const btn = document.getElementById("btnStopSound");
+
+  if (audio)
+    audio
+      .play()
+      .catch((e) => console.log("Lỗi trình duyệt chặn tự phát âm thanh:", e));
+  if (card) {
+    card.classList.add("alert-mode");
+    // Tự động cuộn trang xuống chỗ bảng giao hàng
+    card.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
+  if (btn) btn.style.display = "block";
+}
+
+function stopAlarm() {
+  const audio = document.getElementById("alarmSound");
+  const card = document.getElementById("deliveryCard");
+  const btn = document.getElementById("btnStopSound");
+
+  if (audio) {
+    audio.pause();
+    audio.currentTime = 0; // Trả âm thanh về đầu
+  }
+  if (card) card.classList.remove("alert-mode");
+  if (btn) btn.style.display = "none";
 }

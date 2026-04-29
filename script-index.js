@@ -97,13 +97,14 @@ function addToCart(idx) {
   if (exist) {
     exist.q += inputQty;
   } else {
-    // Lưu thêm thuộc tính img vào mảng giỏ hàng
+    // Lưu thêm thuộc tính img và allowDelivery vào mảng giỏ hàng
     cart.push({
       idx,
       name: product.name,
       price: product.price,
       q: inputQty,
       img: product.img,
+      allowDelivery: product.allowDelivery || false, // <--- THÊM DÒNG NÀY LÀ ĐƯỢC
     });
   }
 
@@ -149,8 +150,27 @@ function renderCart() {
   const badge = document.getElementById("cartBadge");
   if (badge) badge.innerText = totalItems;
 
+  // --- THÊM ĐOẠN LOGIC ẨN/HIỆN NÚT VÀO ĐÂY ---
+  const hasDelivery = cart.some((item) => item.allowDelivery === true);
+  const btnDatHang = document.getElementById("btnDatHang");
+  const btnTienMat = document.getElementById("btnTienMat");
+  const btnQR = document.getElementById("btnQR");
+
+  if (btnDatHang && btnTienMat && btnQR) {
+    if (hasDelivery) {
+      btnDatHang.style.display = "block";
+      btnTienMat.style.display = "none";
+      btnQR.style.display = "none";
+    } else {
+      btnDatHang.style.display = "none";
+      btnTienMat.style.display = "block";
+      btnQR.style.display = "block";
+    }
+  }
+  // --- KẾT THÚC ĐOẠN THÊM ---
+
   return total;
-}
+} // Đây là dấu đóng ngoặc } của hàm renderCart
 
 // 6. Xóa món khỏi giỏ hàng
 function removeFromCart(i) {
@@ -223,4 +243,87 @@ function handlePay(method) {
 
 function closeQR() {
   document.getElementById("qrModal").style.display = "none";
+}
+
+// ==========================================
+// CÁC HÀM XỬ LÝ ĐẶT HÀNG GIAO TẬN NƠI
+// ==========================================
+function openOrderModal() {
+  const sum = renderCart();
+  document.getElementById("orderModalTotal").innerText =
+    sum.toLocaleString() + "đ";
+
+  // Đóng giỏ hàng Offcanvas của Bootstrap để mở Modal cho đỡ vướng
+  const offcanvasEl = document.getElementById("cartOffcanvas");
+  if (offcanvasEl) {
+    const offcanvas = bootstrap.Offcanvas.getInstance(offcanvasEl);
+    if (offcanvas) offcanvas.hide();
+  }
+
+  document.getElementById("orderModal").style.display = "flex";
+}
+
+function closeOrderModal() {
+  document.getElementById("orderModal").style.display = "none";
+}
+
+function submitOrder(e) {
+  e.preventDefault();
+
+  const sum = renderCart();
+  if (cart.length === 0) return alert("Giỏ hàng trống!");
+
+  const name = document.getElementById("cusName").value;
+  const phone = document.getElementById("cusPhone").value;
+  const address = document.getElementById("cusAddress").value;
+
+  const newID = lastBillNumber + 1;
+  const billId = "GH" + newID; // Ký hiệu GH = Giao Hàng
+
+  // Trừ số lượng tồn kho
+  cart.forEach((c) => {
+    dbData.products[c.idx].qty -= c.q;
+  });
+
+  // Ghi lại lịch sử
+  const history = {
+    billId: billId,
+    method: "Giao Hàng",
+    total: sum,
+    time: new Date().toLocaleString("vi-VN"),
+    details:
+      `Khách: ${name} - SĐT: ${phone} - Đ/C: ${address}. Đơn: ` +
+      cart.map((c) => `${c.name}(x${c.q})`).join(", "),
+  };
+
+  const updates = {};
+  updates["/store_data_v3/"] = dbData;
+  updates["/sales_history/" + billId] = history;
+  updates["/lastBillNumber"] = newID;
+
+  // Hiệu ứng Loading nút bấm
+  const btnSubmit = document.querySelector("#orderForm button[type='submit']");
+  btnSubmit.innerText = "⏳ ĐANG XỬ LÝ...";
+  btnSubmit.disabled = true;
+
+  database
+    .ref()
+    .update(updates)
+    .then(() => {
+      alert(
+        `Đã gửi đơn hàng thành công!\nTạp Hóa Ái Cử sẽ sớm giao hàng đến cho ${name}.`,
+      );
+      cart = [];
+      renderCart();
+      renderProducts(); // Load lại giao diện để trừ kho thực tế
+      closeOrderModal();
+      document.getElementById("orderForm").reset();
+    })
+    .catch((err) => {
+      alert("Lỗi kết nối Firebase: " + err.message);
+    })
+    .finally(() => {
+      btnSubmit.innerText = "XÁC NHẬN ĐẶT HÀNG";
+      btnSubmit.disabled = false;
+    });
 }
